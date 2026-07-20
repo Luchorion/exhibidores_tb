@@ -352,3 +352,33 @@
 .exh-grid-point { font-weight: 600; margin-top: 2px; }
 .exh-grid-sub { color: var(--muted); font-size: 11px; margin-top: 2px; }
 .exh-grid-empty { color: var(--muted); font-size: 11px; text-align: center; padding: 10px 0; border: 1px dashed var(--line); border-radius: 3px; }
+
+.exh-disp-wrap { overflow-x: auto; }
+.exh-disp-table { border-collapse: collapse; font-size: 12px; }
+.exh-disp-table th, .exh-disp-table td { padding: 3px; text-align: center; }
+.exh-disp-table thead th {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--muted);
+  font-weight: 600;
+}
+.exh-disp-table tbody th {
+  font-size: 12px;
+  font-weight: 500;
+  text-align: right;
+  padding-right: 8px;
+  white-space: nowrap;
+  color: var(--ink);
+}
+.exh-disp-toggle {
+  width: 26px;
+  height: 26px;
+  border: 1px solid var(--line);
+  border-radius: 3px;
+  background: white;
+  cursor: pointer;
+  padding: 0;
+}
+.exh-disp-toggle.active { background: var(--amber); border-color: var(--amber-dark); }

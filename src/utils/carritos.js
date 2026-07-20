@@ -5,6 +5,7 @@ import { diasDesde } from "./dates";
 export function normalizeCarrito(c) {
   return {
     ...c,
+    estado: c.estado === "de repuesto" ? "repuesto" : c.estado,
     ultimoControlFisico: c.ultimoControlFisico ?? c.ultimoMantenimiento ?? "",
     ultimaRevisionPublicaciones: c.ultimaRevisionPublicaciones ?? "",
   };

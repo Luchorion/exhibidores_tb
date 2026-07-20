@@ -22,6 +22,7 @@ export default function TurnoListView({ turnosPorDia, puntos, carritos, hermanos
                 {t.notas ? ` · ${t.notas}` : ""}
               </div>
               <div className="exh-row-tags">
+                {t.estado === "propuesto" && <span className="exh-badge exh-badge-muted">Propuesto</span>}
                 <span className="exh-badge exh-badge-amber">{t.frecuencia || "Semanal"}</span>
                 {carritosDelTurno.map((c) => <span className="exh-badge exh-badge-slate" key={c.id}>Carrito {c.numero}</span>)}
               </div>

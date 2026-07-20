@@ -29,11 +29,15 @@ export const UBICACIONES_SUGERIDAS = ["Salón del Reino", "Familia Almada", "Fli
 export const DIAS = ["Lun", "Mar", "Mié", "Jue", "Vie", "Sáb", "Dom"];
 export const DIAS_SEMANA = ["Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado", "Domingo"];
 export const FRECUENCIAS = ["Semanal", "Quincenal", "Mensual"];
-export const HORARIOS_PREF = ["Mañana", "Tarde", "Indistinto"];
+export const FRANJAS = ["mañana", "mediodía", "tarde", "noche"];
 export const ESTADOS_HERMANO = [
   { value: "aprobado", label: "Aprobado" },
   { value: "pendiente", label: "Pendiente" },
   { value: "no_aprobado", label: "No aprobado" },
+];
+export const ESTADOS_TURNO = [
+  { value: "confirmado", label: "Confirmado" },
+  { value: "propuesto", label: "Propuesto" },
 ];
 export const DIAS_CONTROL_FISICO = 15;
 export const DIAS_REVISION_PUBLICACIONES = 60;

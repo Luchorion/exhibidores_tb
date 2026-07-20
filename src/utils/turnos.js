@@ -21,6 +21,7 @@ export function normalizeTurno(t) {
     carritoIds,
     hermanoIds,
     conductorLibre: t.conductor && hermanoIds.length === 0 ? t.conductor : "",
+    estado: t.estado === "propuesto" ? "propuesto" : "confirmado",
     notas: t.notas || "",
   };
 }

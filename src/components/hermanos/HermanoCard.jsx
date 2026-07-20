@@ -25,8 +25,7 @@ export default function HermanoCard({ hermano, puntos, turnos, onEdit, onDelete 
         </div>
       </div>
       <div className="exh-meta-row"><span>Fecha aprobación</span><strong>{hermano.fechaAprobacion ? formatFechaCorta(hermano.fechaAprobacion) : "Sin registro"}</strong></div>
-      <div className="exh-meta-row"><span>Días</span><strong>{hermano.diasPreferidos && hermano.diasPreferidos.length ? hermano.diasPreferidos.join(", ") : "Sin definir"}</strong></div>
-      <div className="exh-meta-row"><span>Horario</span><strong>{hermano.horarioPreferido || "Indistinto"}</strong></div>
+      <div className="exh-meta-row"><span>Disponibilidad</span><strong>{hermano.disponibilidad && hermano.disponibilidad.length ? hermano.disponibilidad.join(", ") : "Sin definir"}</strong></div>
       <div className="exh-meta-row"><span>Puntos</span><strong>{nombresPuntos || "Sin preferencia"}</strong></div>
 
       <div style={{ marginTop: 10 }}>

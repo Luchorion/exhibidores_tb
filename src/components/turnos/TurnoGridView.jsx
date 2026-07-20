@@ -29,7 +29,10 @@ export default function TurnoGridView({ turnosPorDia, puntos, carritos, hermanos
                         {t.horaInicio}{t.horaFin ? `–${t.horaFin}` : ""}{" "}
                         {conflictosTurno.length > 0 && <AlertTriangle size={11} style={{ verticalAlign: -1, color: "var(--rust)" }} />}
                       </div>
-                      <div className="exh-grid-point">{punto ? punto.nombre : "Sin punto"}</div>
+                      <div className="exh-grid-point">
+                        {punto ? punto.nombre : "Sin punto"}
+                        {t.estado === "propuesto" && <span className="exh-badge exh-badge-muted" style={{ marginLeft: 5, verticalAlign: 1 }}>Propuesto</span>}
+                      </div>
                       <div className="exh-grid-sub">{hermanosDelTurno.length ? hermanosDelTurno.map((h) => h.nombre).join(", ") : "Sin hermanos"}</div>
                       <div className="exh-grid-sub">{carritosDelTurno.length ? carritosDelTurno.map((c) => `C${c.numero}`).join(", ") : "Sin carrito"} · {t.frecuencia}</div>
                     </div>

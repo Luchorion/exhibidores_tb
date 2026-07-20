@@ -1,5 +1,5 @@
 import { Check, AlertTriangle } from "lucide-react";
-import { DIAS_SEMANA, FRECUENCIAS } from "../../data/constants";
+import { DIAS_SEMANA, ESTADOS_TURNO, FRECUENCIAS } from "../../data/constants";
 import { toggleInArray } from "../../utils/array";
 import { estadoHermanoLabel } from "../../utils/hermanos";
 
@@ -29,6 +29,12 @@ export default function TurnoForm({
           <label className="exh-label">Frecuencia</label>
           <select className="exh-select" value={draft.frecuencia} onChange={(e) => setDraft({ ...draft, frecuencia: e.target.value })}>
             {FRECUENCIAS.map((f) => <option key={f} value={f}>{f}</option>)}
+          </select>
+        </div>
+        <div className="exh-field">
+          <label className="exh-label">Estado</label>
+          <select className="exh-select" value={draft.estado} onChange={(e) => setDraft({ ...draft, estado: e.target.value })}>
+            {ESTADOS_TURNO.map((e) => <option key={e.value} value={e.value}>{e.label}</option>)}
           </select>
         </div>
         <div className="exh-field" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8 }}>

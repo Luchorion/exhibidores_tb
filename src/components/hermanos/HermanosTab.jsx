@@ -3,7 +3,7 @@ import { Plus } from "lucide-react";
 import HermanoForm from "./HermanoForm";
 import HermanoCard from "./HermanoCard";
 
-const EMPTY_DRAFT = { nombre: "", estado: "pendiente", fechaAprobacion: "", diasPreferidos: [], horarioPreferido: "Indistinto", puntosPreferidos: [], notas: "" };
+const EMPTY_DRAFT = { nombre: "", estado: "pendiente", fechaAprobacion: "", disponibilidad: [], puntosPreferidos: [], notas: "" };
 
 export default function HermanosTab({ hermanosOrdenados, puntos, turnos, onSaveHermano, onDeleteHermano }) {
   const [showForm, setShowForm] = useState(false);
@@ -22,8 +22,7 @@ export default function HermanosTab({ hermanosOrdenados, puntos, turnos, onSaveH
       nombre: h.nombre,
       estado: h.estado,
       fechaAprobacion: h.fechaAprobacion || "",
-      diasPreferidos: h.diasPreferidos || [],
-      horarioPreferido: h.horarioPreferido || "Indistinto",
+      disponibilidad: h.disponibilidad || [],
       puntosPreferidos: h.puntosPreferidos || [],
       notas: h.notas || "",
     });

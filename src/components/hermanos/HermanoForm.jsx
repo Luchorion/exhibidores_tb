@@ -1,6 +1,10 @@
 import { Check } from "lucide-react";
-import { DIAS, ESTADOS_HERMANO, HORARIOS_PREF } from "../../data/constants";
+import { DIAS_SEMANA, ESTADOS_HERMANO, FRANJAS } from "../../data/constants";
 import { toggleInArray } from "../../utils/array";
+
+function capitalize(s) {
+  return s.charAt(0).toUpperCase() + s.slice(1);
+}
 
 export default function HermanoForm({ draft, setDraft, puntos, onSave, onCancel }) {
   return (
@@ -16,29 +20,42 @@ export default function HermanoForm({ draft, setDraft, puntos, onSave, onCancel 
             {ESTADOS_HERMANO.map((e) => <option key={e.value} value={e.value}>{e.label}</option>)}
           </select>
         </div>
-        <div className="exh-field">
+        <div className="exh-field full">
           <label className="exh-label">Fecha de aprobación</label>
           <input type="date" className="exh-input" value={draft.fechaAprobacion} onChange={(e) => setDraft({ ...draft, fechaAprobacion: e.target.value })} />
         </div>
-        <div className="exh-field">
-          <label className="exh-label">Horario de preferencia</label>
-          <select className="exh-select" value={draft.horarioPreferido} onChange={(e) => setDraft({ ...draft, horarioPreferido: e.target.value })}>
-            {HORARIOS_PREF.map((h) => <option key={h} value={h}>{h}</option>)}
-          </select>
-        </div>
         <div className="exh-field full">
-          <label className="exh-label">Días de preferencia</label>
-          <div className="exh-chip-group">
-            {DIAS.map((d) => (
-              <button
-                type="button"
-                key={d}
-                className={`exh-chip ${draft.diasPreferidos.includes(d) ? "selected amber" : ""}`}
-                onClick={() => setDraft({ ...draft, diasPreferidos: toggleInArray(draft.diasPreferidos, d) })}
-              >
-                {d}
-              </button>
-            ))}
+          <label className="exh-label">Disponibilidad ({draft.disponibilidad.length} franjas seleccionadas)</label>
+          <div className="exh-disp-wrap">
+            <table className="exh-disp-table">
+              <thead>
+                <tr>
+                  <th></th>
+                  {FRANJAS.map((f) => <th key={f}>{capitalize(f)}</th>)}
+                </tr>
+              </thead>
+              <tbody>
+                {DIAS_SEMANA.map((dia) => (
+                  <tr key={dia}>
+                    <th>{dia}</th>
+                    {FRANJAS.map((f) => {
+                      const value = `${dia} ${f}`;
+                      const active = draft.disponibilidad.includes(value);
+                      return (
+                        <td key={f}>
+                          <button
+                            type="button"
+                            className={`exh-disp-toggle ${active ? "active" : ""}`}
+                            aria-label={value}
+                            onClick={() => setDraft({ ...draft, disponibilidad: toggleInArray(draft.disponibilidad, value) })}
+                          />
+                        </td>
+                      );
+                    })}
+                  </tr>
+                ))}
+              </tbody>
+            </table>
           </div>
         </div>
         <div className="exh-field full">
@@ -58,7 +75,7 @@ export default function HermanoForm({ draft, setDraft, puntos, onSave, onCancel 
         </div>
         <div className="exh-field full">
           <label className="exh-label">Notas</label>
-          <textarea className="exh-textarea" value={draft.notas} onChange={(e) => setDraft({ ...draft, notas: e.target.value })} placeholder="Disponibilidad, restricciones, contacto, etc." />
+          <textarea className="exh-textarea" value={draft.notas} onChange={(e) => setDraft({ ...draft, notas: e.target.value })} placeholder="Restricciones, contacto, etc." />
         </div>
       </div>
       <div className="exh-form-actions">

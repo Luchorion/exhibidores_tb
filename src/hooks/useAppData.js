@@ -4,6 +4,7 @@ import { DEFAULT_PUNTOS, DEFAULT_CARRITOS, DEFAULT_HERMANOS } from "../data/cons
 import { normalizePunto } from "../utils/puntos";
 import { normalizeCarrito } from "../utils/carritos";
 import { normalizeTurno } from "../utils/turnos";
+import { normalizeHermano } from "../utils/hermanos";
 
 const KEYS = {
   puntos: "puntos-data",
@@ -46,7 +47,7 @@ export function useAppData() {
         loadSlice(KEYS.puntos, normalizePunto, DEFAULT_PUNTOS, seeds),
         loadSlice(KEYS.carritos, normalizeCarrito, DEFAULT_CARRITOS, seeds),
         loadSlice(KEYS.turnos, normalizeTurno, [], seeds),
-        loadSlice(KEYS.hermanos, null, DEFAULT_HERMANOS, seeds),
+        loadSlice(KEYS.hermanos, normalizeHermano, DEFAULT_HERMANOS, seeds),
       ]);
 
       if (cancelled) return;

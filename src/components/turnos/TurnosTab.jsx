@@ -5,7 +5,7 @@ import TurnoForm from "./TurnoForm";
 import TurnoListView from "./TurnoListView";
 import TurnoGridView from "./TurnoGridView";
 
-const EMPTY_DRAFT = { dia: "", frecuencia: "Semanal", horaInicio: "", horaFin: "", puntoId: "", carritoIds: [], hermanoIds: [], notas: "" };
+const EMPTY_DRAFT = { dia: "", frecuencia: "Semanal", estado: "confirmado", horaInicio: "", horaFin: "", puntoId: "", carritoIds: [], hermanoIds: [], notas: "" };
 
 export default function TurnosTab({
   puntos,
@@ -35,6 +35,7 @@ export default function TurnosTab({
     setDraft({
       dia: t.dia || "",
       frecuencia: t.frecuencia || "Semanal",
+      estado: t.estado || "confirmado",
       horaInicio: t.horaInicio || "",
       horaFin: t.horaFin || "",
       puntoId: t.puntoId || "",
