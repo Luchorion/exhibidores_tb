@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Pencil, Check, Wrench, AlertTriangle } from "lucide-react";
 import { DIAS_CONTROL_FISICO, DIAS_REVISION_PUBLICACIONES, UBICACIONES_SUGERIDAS } from "../../data/constants";
 import { diasDesde, formatFechaCorta } from "../../utils/dates";
-import { estadoCarritoBadgeClass } from "../../utils/carritos";
+import { estadoCarritoAccentClass, estadoCarritoBadgeClass } from "../../utils/carritos";
 import { useEdicion } from "../../context/edicion";
 import Modal from "../Modal";
 
@@ -28,7 +28,7 @@ export default function CarritoCard({ carrito, portadasSugeridas, onSave, onMark
   const pubVencida = diasPub === null || diasPub > DIAS_REVISION_PUBLICACIONES;
 
   return (
-    <div className="exh-card">
+    <div className={`exh-card ${estadoCarritoAccentClass(carrito.estado)}`}>
       {editing && (
         <Modal title={`Editar carrito ${String(carrito.numero).padStart(2, "0")}`} onClose={() => setEditing(false)}>
           <div className="exh-form">

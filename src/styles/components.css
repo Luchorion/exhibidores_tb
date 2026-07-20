@@ -216,7 +216,8 @@
   margin-bottom: 6px;
 }
 
-.exh-row.conflicto { border-left-color: var(--rust); }
+.exh-row.propuesto { border-left-color: var(--amber); background: rgba(226,167,59,0.07); }
+.exh-row.conflicto { border-left-color: var(--rust); background: var(--paper-raised); }
 
 .exh-time {
   font-family: 'IBM Plex Mono', monospace;
@@ -325,6 +326,11 @@
   padding: 14px;
 }
 
+.exh-card-accent-green { border-left: 4px solid var(--green); }
+.exh-card-accent-amber { border-left: 4px solid var(--amber); }
+.exh-card-accent-muted { border-left: 4px solid var(--muted); }
+.exh-card-accent-rust { border-left: 4px solid var(--rust); }
+
 .exh-card-head {
   display: flex;
   justify-content: space-between;
@@ -394,7 +400,8 @@
   padding: 7px 9px;
   font-size: 12px;
 }
-.exh-grid-card.conflicto { border-left-color: var(--rust); }
+.exh-grid-card.propuesto { border-left-color: var(--amber); background: rgba(226,167,59,0.07); }
+.exh-grid-card.conflicto { border-left-color: var(--rust); background: var(--paper-raised); }
 .exh-grid-time { font-family: 'IBM Plex Mono', monospace; font-weight: 600; font-size: 12px; }
 .exh-grid-point { font-weight: 600; margin-top: 2px; }
 .exh-grid-sub { color: var(--muted); font-size: 11px; margin-top: 2px; }
@@ -411,21 +418,6 @@
   white-space: nowrap;
   display: inline-flex;
   align-items: center;
-}
-
-/* ---------- Ajustes responsive (celular / tablet) ---------- */
-@media (max-width: 640px) {
-  .exh-content { padding: 16px 12px; }
-  .exh-nav { padding: 0 10px; }
-  .exh-form-grid { grid-template-columns: 1fr; }
-  .exh-modal-overlay { padding: 10px 6px; }
-  /* 16px evita que iOS haga zoom automático al enfocar un campo */
-  .exh-input, .exh-select, .exh-textarea { font-size: 16px; }
-  .exh-search { flex: 1; min-width: 0; }
-  .exh-search .exh-input { width: 100%; }
-  .exh-filter-bar .exh-select-sm { flex: 1; min-width: 130px; }
-  .exh-row { flex-wrap: wrap; gap: 6px 14px; }
-  .exh-time { min-width: 0; width: 100%; padding-top: 0; }
 }
 
 .exh-filter-bar {
@@ -538,3 +530,28 @@
   padding: 0;
 }
 .exh-disp-toggle.active { background: var(--amber); border-color: var(--amber-dark); }
+
+/* ---------- Ajustes responsive (celular / tablet) ----------
+   Este bloque va al final a propósito: varias reglas de arriba
+   (.exh-search .exh-input, etc.) tienen la misma especificidad que las
+   de acá, y en un empate gana la que aparece último en el archivo. */
+@media (max-width: 640px) {
+  .exh-content { padding: 16px 12px; }
+  .exh-nav { padding: 0 10px; }
+  .exh-form-grid { grid-template-columns: 1fr; }
+  .exh-modal-overlay { padding: 10px 6px; }
+  /* 16px evita que iOS haga zoom automático al enfocar un campo */
+  .exh-input, .exh-select, .exh-textarea, .exh-search .exh-input { font-size: 16px; }
+  .exh-row { flex-wrap: wrap; gap: 6px 14px; }
+  .exh-time { min-width: 0; width: 100%; padding-top: 0; }
+
+  /* El buscador y los filtros comparten fila con los <select> del filtro
+     de arriba; sin un ancho de línea propio, el buscador (flex:1 con
+     min-width:0) se comprimía a ~20px en vez de ocupar su lugar. Forzamos
+     que el buscador ocupe toda la fila y que los selects se acomoden
+     debajo, en vez de competir por el mismo espacio angosto. */
+  .exh-filter-bar { flex-direction: column; align-items: stretch; }
+  .exh-search { flex: none; width: 100%; }
+  .exh-search .exh-input { width: 100%; }
+  .exh-filter-bar .exh-select-sm { flex: none; width: 100%; }
+}

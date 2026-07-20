@@ -12,11 +12,21 @@ export function normalizeCarrito(c) {
   };
 }
 
+// Un mismo color por estado, reutilizado tanto para el badge como para el
+// borde de acento de la tarjeta: operativo=verde, repuesto=gris,
+// pendiente=ámbar, cualquier otro valor=rojo (caso inesperado).
+const ESTADO_CARRITO_COLOR = { operativo: "green", repuesto: "muted", pendiente: "amber" };
+
+function estadoCarritoColor(estado) {
+  return ESTADO_CARRITO_COLOR[estado] || "rust";
+}
+
 export function estadoCarritoBadgeClass(estado) {
-  if (estado === "operativo") return "exh-badge-green";
-  if (estado === "repuesto") return "exh-badge-muted";
-  if (estado === "pendiente") return "exh-badge-amber";
-  return "exh-badge-rust";
+  return `exh-badge-${estadoCarritoColor(estado)}`;
+}
+
+export function estadoCarritoAccentClass(estado) {
+  return `exh-card-accent-${estadoCarritoColor(estado)}`;
 }
 
 export function carritoVencido(c, diasControlLimite, diasPubLimite) {

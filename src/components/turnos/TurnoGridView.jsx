@@ -19,9 +19,10 @@ export default function TurnoGridView({ turnosPorDia, puntos, carritos, hermanos
                   const carritosDelTurno = carritos.filter((c) => (t.carritoIds || []).includes(c.id));
                   const hermanosDelTurno = hermanos.filter((h) => (t.hermanoIds || []).includes(h.id));
                   const conflictosTurno = conflictMap[t.id] || [];
+                  const esPropuesto = t.estado === "propuesto";
                   return (
                     <div
-                      className={`exh-grid-card ${conflictosTurno.length ? "conflicto" : ""}`}
+                      className={`exh-grid-card ${esPropuesto ? "propuesto" : ""} ${conflictosTurno.length ? "conflicto" : ""}`}
                       key={t.id}
                       onClick={modoEdicion ? () => onEdit(t) : undefined}
                       style={modoEdicion ? { cursor: "pointer" } : undefined}
@@ -33,7 +34,7 @@ export default function TurnoGridView({ turnosPorDia, puntos, carritos, hermanos
                       </div>
                       <div className="exh-grid-point">
                         {punto ? punto.nombre : "Sin punto"}
-                        {t.estado === "propuesto" && <span className="exh-badge exh-badge-muted" style={{ marginLeft: 5, verticalAlign: 1 }}>Propuesto</span>}
+                        {esPropuesto && <span className="exh-badge exh-badge-amber" style={{ marginLeft: 5, verticalAlign: 1 }}>Propuesto</span>}
                       </div>
                       {hermanosDelTurno.length ? (
                         <div className="exh-personas">

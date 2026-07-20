@@ -12,8 +12,9 @@ export default function TurnoListView({ turnosPorDia, puntos, carritos, hermanos
         const carritosDelTurno = carritos.filter((c) => (t.carritoIds || []).includes(c.id));
         const hermanosDelTurno = hermanos.filter((h) => (t.hermanoIds || []).includes(h.id));
         const conflictosTurno = conflictMap[t.id] || [];
+        const esPropuesto = t.estado === "propuesto";
         return (
-          <div className={`exh-row ${conflictosTurno.length ? "conflicto" : ""}`} key={t.id}>
+          <div className={`exh-row ${esPropuesto ? "propuesto" : ""} ${conflictosTurno.length ? "conflicto" : ""}`} key={t.id}>
             <div className="exh-time"><Clock size={13} style={{ marginRight: 4, verticalAlign: -2 }} />{t.horaInicio}{t.horaFin ? `–${t.horaFin}` : ""}</div>
             <div className="exh-row-main">
               <div className="exh-row-point">{punto ? punto.nombre : "Punto sin definir"}</div>
@@ -26,7 +27,7 @@ export default function TurnoListView({ turnosPorDia, puntos, carritos, hermanos
               )}
               {t.notas && <div className="exh-row-sub">{t.notas}</div>}
               <div className="exh-row-tags">
-                {t.estado === "propuesto" && <span className="exh-badge exh-badge-muted">Propuesto</span>}
+                {esPropuesto && <span className="exh-badge exh-badge-amber">Propuesto</span>}
                 <span className="exh-badge exh-badge-amber">{t.frecuencia || "Semanal"}</span>
                 {carritosDelTurno.map((c) => <span className="exh-badge exh-badge-slate" key={c.id}>Carrito {c.numero}</span>)}
               </div>
