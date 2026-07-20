@@ -3,9 +3,11 @@ import { Pencil, Check, Wrench, AlertTriangle } from "lucide-react";
 import { DIAS_CONTROL_FISICO, DIAS_REVISION_PUBLICACIONES, UBICACIONES_SUGERIDAS } from "../../data/constants";
 import { diasDesde, formatFechaCorta } from "../../utils/dates";
 import { estadoCarritoBadgeClass } from "../../utils/carritos";
+import { useEdicion } from "../../context/edicion";
 import Modal from "../Modal";
 
 export default function CarritoCard({ carrito, portadasSugeridas, onSave, onMarkControl, onMarkRevision }) {
+  const modoEdicion = useEdicion();
   const [editing, setEditing] = useState(false);
   const [draft, setDraft] = useState(null);
 
@@ -69,7 +71,7 @@ export default function CarritoCard({ carrito, portadasSugeridas, onSave, onMark
         <span className="exh-plate">{String(carrito.numero).padStart(2, "0")}</span>
         <div className="exh-card-actions">
           <span className={`exh-badge ${estadoCarritoBadgeClass(carrito.estado)}`}>{carrito.estado}</span>
-          <button type="button" className="exh-icon-btn" onClick={startEdit}><Pencil size={14} /></button>
+          {modoEdicion && <button type="button" className="exh-icon-btn" onClick={startEdit}><Pencil size={14} /></button>}
         </div>
       </div>
       <div className="exh-meta-row"><span>Ubicación</span><strong>{carrito.ubicacion || "Sin asignar"}</strong></div>
@@ -85,9 +87,11 @@ export default function CarritoCard({ carrito, portadasSugeridas, onSave, onMark
           <span>Vencido: corresponde controlarlo cada {DIAS_CONTROL_FISICO} días.</span>
         </div>
       )}
-      <div className="exh-form-actions" style={{ marginTop: 8 }}>
-        <button type="button" className="exh-btn exh-btn-ghost" onClick={() => onMarkControl(carrito)}><Wrench size={13} /> Registrar control hoy</button>
-      </div>
+      {modoEdicion && (
+        <div className="exh-form-actions" style={{ marginTop: 8 }}>
+          <button type="button" className="exh-btn exh-btn-ghost" onClick={() => onMarkControl(carrito)}><Wrench size={13} /> Registrar control hoy</button>
+        </div>
+      )}
 
       <div className="exh-meta-row" style={{ marginTop: 10 }}>
         <span>Revisión publicaciones</span>
@@ -99,9 +103,11 @@ export default function CarritoCard({ carrito, portadasSugeridas, onSave, onMark
           <span>Vencida: corresponde revisarla cada {DIAS_REVISION_PUBLICACIONES} días (~2 meses).</span>
         </div>
       )}
-      <div className="exh-form-actions" style={{ marginTop: 8 }}>
-        <button type="button" className="exh-btn exh-btn-ghost" onClick={() => onMarkRevision(carrito)}><Wrench size={13} /> Registrar revisión hoy</button>
-      </div>
+      {modoEdicion && (
+        <div className="exh-form-actions" style={{ marginTop: 8 }}>
+          <button type="button" className="exh-btn exh-btn-ghost" onClick={() => onMarkRevision(carrito)}><Wrench size={13} /> Registrar revisión hoy</button>
+        </div>
+      )}
 
       {carrito.notas && <div className="exh-card-body" style={{ marginTop: 10 }}>{carrito.notas}</div>}
     </div>

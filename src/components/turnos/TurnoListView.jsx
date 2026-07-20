@@ -1,7 +1,9 @@
 import { Clock, AlertTriangle, Pencil, Trash2 } from "lucide-react";
 import { DIAS_SEMANA } from "../../data/constants";
+import { useEdicion } from "../../context/edicion";
 
 export default function TurnoListView({ turnosPorDia, puntos, carritos, hermanos, conflictMap, describeConflicto, onEdit, onDelete }) {
+  const modoEdicion = useEdicion();
   return DIAS_SEMANA.filter((d) => turnosPorDia[d] && turnosPorDia[d].length > 0).map((dia) => (
     <div className="exh-date-group" key={dia}>
       <div className="exh-date-label">{dia}</div>
@@ -35,10 +37,12 @@ export default function TurnoListView({ turnosPorDia, puntos, carritos, hermanos
                 </div>
               )}
             </div>
-            <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
-              <button type="button" className="exh-icon-btn" onClick={() => onEdit(t)}><Pencil size={15} /></button>
-              <button type="button" className="exh-icon-btn" onClick={() => onDelete(t.id)}><Trash2 size={15} /></button>
-            </div>
+            {modoEdicion && (
+              <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
+                <button type="button" className="exh-icon-btn" onClick={() => onEdit(t)}><Pencil size={15} /></button>
+                <button type="button" className="exh-icon-btn" onClick={() => onDelete(t.id)}><Trash2 size={15} /></button>
+              </div>
+            )}
           </div>
         );
       })}

@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Plus } from "lucide-react";
+import { useEdicion } from "../../context/edicion";
 import Modal from "../Modal";
 import PuntoForm from "./PuntoForm";
 import PuntoCard from "./PuntoCard";
@@ -7,6 +8,7 @@ import PuntoCard from "./PuntoCard";
 const EMPTY_DRAFT = { nombre: "", observaciones: "" };
 
 export default function PuntosTab({ puntos, turnos, onSavePunto, onDeletePunto }) {
+  const modoEdicion = useEdicion();
   const [showForm, setShowForm] = useState(false);
   const [editingId, setEditingId] = useState(null);
   const [draft, setDraft] = useState(EMPTY_DRAFT);
@@ -39,7 +41,9 @@ export default function PuntosTab({ puntos, turnos, onSavePunto, onDeletePunto }
     <section>
       <div className="exh-section-head">
         <p className="exh-section-title">Puntos de predicación</p>
-        <button type="button" className="exh-btn exh-btn-amber" onClick={startNew}><Plus size={15} /> Nuevo punto</button>
+        {modoEdicion && (
+          <button type="button" className="exh-btn exh-btn-amber" onClick={startNew}><Plus size={15} /> Nuevo punto</button>
+        )}
       </div>
 
       {showForm && (

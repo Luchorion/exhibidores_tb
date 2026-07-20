@@ -1,4 +1,5 @@
 import { useMemo, useState } from "react";
+import { EdicionContext } from "./context/edicion";
 import { useAppData } from "./hooks/useAppData";
 import { uid } from "./utils/id";
 import { ordenarTurnos, computeConflictMap } from "./utils/turnos";
@@ -13,6 +14,15 @@ import HermanosTab from "./components/hermanos/HermanosTab";
 
 export default function App() {
   const [tab, setTab] = useState("turnos");
+  const [modoEdicion, setModoEdicion] = useState(() => localStorage.getItem("exh-modo-edicion") === "1");
+
+  function toggleEdicion() {
+    setModoEdicion((prev) => {
+      const next = !prev;
+      localStorage.setItem("exh-modo-edicion", next ? "1" : "0");
+      return next;
+    });
+  }
   const {
     loading,
     puntos, setPuntos,
@@ -113,6 +123,7 @@ export default function App() {
   }
 
   return (
+    <EdicionContext.Provider value={modoEdicion}>
     <div className="exh-root">
       <Header
         operativos={operativos}
@@ -124,6 +135,8 @@ export default function App() {
         turnosProgramados={turnos.length}
         carritosVencidos={carritosVencidos}
         totalTurnosConConflicto={totalTurnosConConflicto}
+        modoEdicion={modoEdicion}
+        onToggleEdicion={toggleEdicion}
       />
 
       <NavTabs tab={tab} setTab={setTab} />
@@ -173,5 +186,6 @@ export default function App() {
         )}
       </main>
     </div>
+    </EdicionContext.Provider>
   );
 }

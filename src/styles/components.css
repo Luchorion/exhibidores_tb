@@ -15,6 +15,53 @@
   margin: 0;
 }
 
+.exh-header-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+}
+
+.exh-switch {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 4px 0;
+  user-select: none;
+}
+.exh-switch-label {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: rgba(238,241,239,0.6);
+}
+.exh-switch.on .exh-switch-label { color: var(--amber); }
+.exh-switch-track {
+  width: 34px;
+  height: 18px;
+  border-radius: 10px;
+  background: rgba(255,255,255,0.25);
+  position: relative;
+  transition: background 0.15s;
+  flex-shrink: 0;
+}
+.exh-switch.on .exh-switch-track { background: var(--amber); }
+.exh-switch-thumb {
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: white;
+  transition: left 0.15s;
+}
+.exh-switch.on .exh-switch-thumb { left: 18px; }
+
 .exh-board {
   display: flex;
   gap: 0;

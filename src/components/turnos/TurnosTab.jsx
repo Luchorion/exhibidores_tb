@@ -2,6 +2,7 @@ import { useMemo, useState } from "react";
 import { Plus, List, LayoutGrid, Filter } from "lucide-react";
 import { FRECUENCIAS } from "../../data/constants";
 import { agruparTurnosPorDia, computeConflictMap, describeConflicto as describeConflictoUtil } from "../../utils/turnos";
+import { useEdicion } from "../../context/edicion";
 import Modal from "../Modal";
 import TurnoForm from "./TurnoForm";
 import TurnoListView from "./TurnoListView";
@@ -20,6 +21,7 @@ export default function TurnosTab({
   onSaveTurno,
   onDeleteTurno,
 }) {
+  const modoEdicion = useEdicion();
   const [vista, setVista] = useState("lista");
   const [showForm, setShowForm] = useState(false);
   const [editingId, setEditingId] = useState(null);
@@ -91,9 +93,11 @@ export default function TurnosTab({
             <button type="button" className={`exh-toggle-btn ${vista === "lista" ? "active" : ""}`} onClick={() => setVista("lista")}><List size={13} /> Lista</button>
             <button type="button" className={`exh-toggle-btn ${vista === "grilla" ? "active" : ""}`} onClick={() => setVista("grilla")}><LayoutGrid size={13} /> Grilla</button>
           </div>
-          <button type="button" className="exh-btn exh-btn-amber" onClick={startNew}>
-            <Plus size={15} /> Nuevo turno
-          </button>
+          {modoEdicion && (
+            <button type="button" className="exh-btn exh-btn-amber" onClick={startNew}>
+              <Plus size={15} /> Nuevo turno
+            </button>
+          )}
         </div>
       </div>
 

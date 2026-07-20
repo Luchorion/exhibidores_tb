@@ -2,8 +2,10 @@ import { User, Pencil, Trash2, Clock } from "lucide-react";
 import { formatFechaCorta } from "../../utils/dates";
 import { estadoHermanoBadgeClass, estadoHermanoLabel } from "../../utils/hermanos";
 import { turnosDeHermano } from "../../utils/turnos";
+import { useEdicion } from "../../context/edicion";
 
 export default function HermanoCard({ hermano, puntos, turnos, onEdit, onDelete }) {
+  const modoEdicion = useEdicion();
   const nombresPuntos = (hermano.puntosPreferidos || [])
     .map((pid) => puntos.find((p) => p.id === pid))
     .filter(Boolean)
@@ -19,10 +21,12 @@ export default function HermanoCard({ hermano, puntos, turnos, onEdit, onDelete 
           <div className="exh-card-title"><User size={13} style={{ marginRight: 4, verticalAlign: -2 }} />{hermano.nombre}</div>
           <span className={`exh-badge ${estadoHermanoBadgeClass(hermano.estado)}`}>{estadoHermanoLabel(hermano.estado)}</span>
         </div>
-        <div className="exh-card-actions">
-          <button type="button" className="exh-icon-btn" onClick={() => onEdit(hermano)}><Pencil size={14} /></button>
-          <button type="button" className="exh-icon-btn" onClick={() => onDelete(hermano.id)}><Trash2 size={14} /></button>
-        </div>
+        {modoEdicion && (
+          <div className="exh-card-actions">
+            <button type="button" className="exh-icon-btn" onClick={() => onEdit(hermano)}><Pencil size={14} /></button>
+            <button type="button" className="exh-icon-btn" onClick={() => onDelete(hermano.id)}><Trash2 size={14} /></button>
+          </div>
+        )}
       </div>
       <div className="exh-meta-row"><span>Fecha aprobación</span><strong>{hermano.fechaAprobacion ? formatFechaCorta(hermano.fechaAprobacion) : "Sin registro"}</strong></div>
       <div className="exh-meta-row"><span>Disponibilidad</span><strong>{hermano.disponibilidad && hermano.disponibilidad.length ? hermano.disponibilidad.join(", ") : "Sin definir"}</strong></div>

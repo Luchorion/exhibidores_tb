@@ -1,7 +1,9 @@
 import { AlertTriangle } from "lucide-react";
 import { DIAS_SEMANA } from "../../data/constants";
+import { useEdicion } from "../../context/edicion";
 
 export default function TurnoGridView({ turnosPorDia, puntos, carritos, hermanos, conflictMap, onEdit }) {
+  const modoEdicion = useEdicion();
   return (
     <div className="exh-grid-wrap">
       <div className="exh-grid">
@@ -21,9 +23,9 @@ export default function TurnoGridView({ turnosPorDia, puntos, carritos, hermanos
                     <div
                       className={`exh-grid-card ${conflictosTurno.length ? "conflicto" : ""}`}
                       key={t.id}
-                      onClick={() => onEdit(t)}
-                      style={{ cursor: "pointer" }}
-                      title="Tocar para editar"
+                      onClick={modoEdicion ? () => onEdit(t) : undefined}
+                      style={modoEdicion ? { cursor: "pointer" } : undefined}
+                      title={modoEdicion ? "Tocar para editar" : undefined}
                     >
                       <div className="exh-grid-time">
                         {t.horaInicio}{t.horaFin ? `–${t.horaFin}` : ""}{" "}

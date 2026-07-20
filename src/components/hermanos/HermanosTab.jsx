@@ -2,6 +2,7 @@ import { useMemo, useState } from "react";
 import { Plus, Search } from "lucide-react";
 import { ESTADOS_HERMANO } from "../../data/constants";
 import { normalizarTexto } from "../../utils/text";
+import { useEdicion } from "../../context/edicion";
 import Modal from "../Modal";
 import HermanoForm from "./HermanoForm";
 import HermanoCard from "./HermanoCard";
@@ -9,6 +10,7 @@ import HermanoCard from "./HermanoCard";
 const EMPTY_DRAFT = { nombre: "", estado: "pendiente", fechaAprobacion: "", disponibilidad: [], puntosPreferidos: [], notas: "" };
 
 export default function HermanosTab({ hermanosOrdenados, puntos, turnos, onSaveHermano, onDeleteHermano }) {
+  const modoEdicion = useEdicion();
   const [showForm, setShowForm] = useState(false);
   const [editingId, setEditingId] = useState(null);
   const [draft, setDraft] = useState(EMPTY_DRAFT);
@@ -61,7 +63,9 @@ export default function HermanosTab({ hermanosOrdenados, puntos, turnos, onSaveH
     <section>
       <div className="exh-section-head">
         <p className="exh-section-title">Hermanos para exhibidores</p>
-        <button type="button" className="exh-btn exh-btn-amber" onClick={startNew}><Plus size={15} /> Nuevo hermano</button>
+        {modoEdicion && (
+          <button type="button" className="exh-btn exh-btn-amber" onClick={startNew}><Plus size={15} /> Nuevo hermano</button>
+        )}
       </div>
 
       {hermanosOrdenados.length > 0 && (

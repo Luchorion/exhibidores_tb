@@ -8,10 +8,24 @@ export default function Header({
   turnosProgramados,
   carritosVencidos,
   totalTurnosConConflicto,
+  modoEdicion,
+  onToggleEdicion,
 }) {
   return (
     <header className="exh-header">
-      <h1 className="exh-title">Talleres Boulogne</h1>
+      <div className="exh-header-top">
+        <h1 className="exh-title">Talleres Boulogne</h1>
+        <button
+          type="button"
+          className={`exh-switch ${modoEdicion ? "on" : ""}`}
+          onClick={onToggleEdicion}
+          aria-pressed={modoEdicion}
+          title={modoEdicion ? "Modo edición activado: podés crear, editar y borrar" : "Modo solo lectura: activá la edición para hacer cambios"}
+        >
+          <span className="exh-switch-label">Edición</span>
+          <span className="exh-switch-track"><span className="exh-switch-thumb" /></span>
+        </button>
+      </div>
       <div className="exh-board">
         <div className="exh-board-cell">
           <p className="exh-board-label">Carritos operativos</p>
