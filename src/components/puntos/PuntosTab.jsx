@@ -5,7 +5,7 @@ import PuntoCard from "./PuntoCard";
 
 const EMPTY_DRAFT = { nombre: "", observaciones: "" };
 
-export default function PuntosTab({ puntos, onSavePunto, onDeletePunto }) {
+export default function PuntosTab({ puntos, turnos, onSavePunto, onDeletePunto }) {
   const [showForm, setShowForm] = useState(false);
   const [editingId, setEditingId] = useState(null);
   const [draft, setDraft] = useState(EMPTY_DRAFT);
@@ -47,7 +47,13 @@ export default function PuntosTab({ puntos, onSavePunto, onDeletePunto }) {
 
       <div className="exh-cards">
         {puntos.map((p) => (
-          <PuntoCard key={p.id} punto={p} onEdit={startEdit} onDelete={onDeletePunto} />
+          <PuntoCard
+            key={p.id}
+            punto={p}
+            turnosAsignados={turnos.filter((t) => t.puntoId === p.id).length}
+            onEdit={startEdit}
+            onDelete={onDeletePunto}
+          />
         ))}
       </div>
     </section>

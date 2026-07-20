@@ -26,6 +26,7 @@ export const DEFAULT_CARRITOS = [
 export const DEFAULT_HERMANOS = [];
 
 export const UBICACIONES_SUGERIDAS = ["Salón del Reino", "Familia Almada", "Flia. Di Caprio", "Maria Graziano", "Pablo Carricaburo"];
+export const PORTADAS_SUGERIDAS = ["La Atalaya (edición pública)", "¡Despertad!", "Libro Enseña"];
 export const DIAS = ["Lun", "Mar", "Mié", "Jue", "Vie", "Sáb", "Dom"];
 export const DIAS_SEMANA = ["Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado", "Domingo"];
 export const FRECUENCIAS = ["Semanal", "Quincenal", "Mensual"];

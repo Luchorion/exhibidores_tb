@@ -353,6 +353,87 @@
 .exh-grid-sub { color: var(--muted); font-size: 11px; margin-top: 2px; }
 .exh-grid-empty { color: var(--muted); font-size: 11px; text-align: center; padding: 10px 0; border: 1px dashed var(--line); border-radius: 3px; }
 
+.exh-filter-bar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+  margin-bottom: 14px;
+}
+.exh-select-sm { padding: 6px 8px; font-size: 12.5px; }
+
+.exh-search { position: relative; display: inline-flex; }
+.exh-search svg {
+  position: absolute;
+  left: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--muted);
+  pointer-events: none;
+}
+.exh-search .exh-input { padding-left: 28px; font-size: 13px; }
+
+.exh-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(22,33,58,0.5);
+  z-index: 100;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding: 32px 14px;
+  overflow-y: auto;
+}
+.exh-modal {
+  background: var(--paper);
+  border-radius: 5px;
+  width: 100%;
+  max-width: 680px;
+  box-shadow: 0 12px 40px rgba(22,33,58,0.35);
+}
+.exh-modal-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 14px 16px 6px;
+}
+.exh-modal-body { padding: 0 16px 16px; }
+.exh-modal-body .exh-form { margin-bottom: 0; }
+
+.exh-picker { position: relative; }
+.exh-picker-list {
+  position: absolute;
+  top: calc(100% + 3px);
+  left: 0;
+  right: 0;
+  background: white;
+  border: 1px solid var(--line);
+  border-radius: 3px;
+  max-height: 230px;
+  overflow-y: auto;
+  z-index: 60;
+  box-shadow: 0 8px 20px rgba(22,33,58,0.15);
+}
+.exh-picker-item {
+  padding: 8px 11px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  font-size: 13.5px;
+}
+.exh-picker-item:hover { background: var(--paper); }
+.exh-picker-item.selected { font-weight: 600; }
+.exh-picker-empty { padding: 10px; color: var(--muted); font-size: 12.5px; text-align: center; }
+.exh-chip-x {
+  background: none;
+  border: none;
+  color: inherit;
+  cursor: pointer;
+  padding: 0 0 0 6px;
+  display: inline-flex;
+  align-items: center;
+}
+
 .exh-disp-wrap { overflow-x: auto; }
 .exh-disp-table { border-collapse: collapse; font-size: 12px; }
 .exh-disp-table th, .exh-disp-table td { padding: 3px; text-align: center; }

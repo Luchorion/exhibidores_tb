@@ -1,7 +1,9 @@
-import { Check, AlertTriangle } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
+import { Check, AlertTriangle, Search, X } from "lucide-react";
 import { DIAS_SEMANA, ESTADOS_TURNO, FRECUENCIAS } from "../../data/constants";
 import { toggleInArray } from "../../utils/array";
 import { estadoHermanoLabel } from "../../utils/hermanos";
+import { normalizarTexto } from "../../utils/text";
 
 export default function TurnoForm({
   draft,
@@ -15,6 +17,25 @@ export default function TurnoForm({
   onSave,
   onCancel,
 }) {
+  const [hermanoQuery, setHermanoQuery] = useState("");
+  const [pickerOpen, setPickerOpen] = useState(false);
+  const pickerRef = useRef(null);
+
+  useEffect(() => {
+    function onDocClick(e) {
+      if (pickerRef.current && !pickerRef.current.contains(e.target)) setPickerOpen(false);
+    }
+    document.addEventListener("mousedown", onDocClick);
+    return () => document.removeEventListener("mousedown", onDocClick);
+  }, []);
+
+  const hermanosFiltrados = hermanosOrdenados.filter((h) =>
+    normalizarTexto(h.nombre).includes(normalizarTexto(hermanoQuery))
+  );
+  const hermanosSeleccionados = draft.hermanoIds
+    .map((id) => hermanosOrdenados.find((h) => h.id === id))
+    .filter(Boolean);
+
   return (
     <div className="exh-form">
       <div className="exh-form-grid">
@@ -74,19 +95,60 @@ export default function TurnoForm({
           {hermanosOrdenados.length === 0 ? (
             <p style={{ fontSize: 12, color: "var(--muted)" }}>Todavía no cargaste hermanos. Agregalos en la pestaña "Hermanos".</p>
           ) : (
-            <div className="exh-chip-group">
-              {hermanosOrdenados.map((h) => (
-                <button
-                  type="button"
-                  key={h.id}
-                  className={`exh-chip ${draft.hermanoIds.includes(h.id) ? "selected" : ""}`}
-                  onClick={() => setDraft({ ...draft, hermanoIds: toggleInArray(draft.hermanoIds, h.id) })}
-                  title={estadoHermanoLabel(h.estado)}
-                >
-                  <span className={`exh-estado-dot ${h.estado}`} />{h.nombre}
-                </button>
-              ))}
-            </div>
+            <>
+              <div className="exh-picker" ref={pickerRef}>
+                <div className="exh-search" style={{ display: "flex" }}>
+                  <Search size={13} />
+                  <input
+                    className="exh-input"
+                    style={{ width: "100%" }}
+                    placeholder="Buscar y agregar hermanos…"
+                    value={hermanoQuery}
+                    onChange={(e) => { setHermanoQuery(e.target.value); setPickerOpen(true); }}
+                    onFocus={() => setPickerOpen(true)}
+                  />
+                </div>
+                {pickerOpen && (
+                  <div className="exh-picker-list">
+                    {hermanosFiltrados.length === 0 ? (
+                      <div className="exh-picker-empty">Sin resultados para "{hermanoQuery}"</div>
+                    ) : (
+                      hermanosFiltrados.map((h) => {
+                        const seleccionado = draft.hermanoIds.includes(h.id);
+                        return (
+                          <div
+                            key={h.id}
+                            className={`exh-picker-item ${seleccionado ? "selected" : ""}`}
+                            title={estadoHermanoLabel(h.estado)}
+                            onClick={() => setDraft({ ...draft, hermanoIds: toggleInArray(draft.hermanoIds, h.id) })}
+                          >
+                            <span className={`exh-estado-dot ${h.estado}`} />{h.nombre}
+                            {seleccionado && <Check size={13} style={{ marginLeft: "auto", color: "var(--green)" }} />}
+                          </div>
+                        );
+                      })
+                    )}
+                  </div>
+                )}
+              </div>
+              {hermanosSeleccionados.length > 0 && (
+                <div className="exh-chip-group" style={{ marginTop: 8 }}>
+                  {hermanosSeleccionados.map((h) => (
+                    <span className="exh-chip selected" key={h.id} title={estadoHermanoLabel(h.estado)}>
+                      <span className={`exh-estado-dot ${h.estado}`} />{h.nombre}
+                      <button
+                        type="button"
+                        className="exh-chip-x"
+                        aria-label={`Quitar a ${h.nombre}`}
+                        onClick={() => setDraft({ ...draft, hermanoIds: draft.hermanoIds.filter((id) => id !== h.id) })}
+                      >
+                        <X size={12} />
+                      </button>
+                    </span>
+                  ))}
+                </div>
+              )}
+            </>
           )}
           {conflictos.length > 0 && (
             <div className="exh-warn-box">

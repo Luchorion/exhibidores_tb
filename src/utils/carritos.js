@@ -6,6 +6,7 @@ export function normalizeCarrito(c) {
   return {
     ...c,
     estado: c.estado === "de repuesto" ? "repuesto" : c.estado,
+    portada: c.portada ?? "",
     ultimoControlFisico: c.ultimoControlFisico ?? c.ultimoMantenimiento ?? "",
     ultimaRevisionPublicaciones: c.ultimaRevisionPublicaciones ?? "",
   };

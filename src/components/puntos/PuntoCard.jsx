@@ -1,6 +1,6 @@
 import { MapPin, Pencil, Trash2 } from "lucide-react";
 
-export default function PuntoCard({ punto, onEdit, onDelete }) {
+export default function PuntoCard({ punto, turnosAsignados, onEdit, onDelete }) {
   return (
     <div className="exh-card">
       <div className="exh-card-head">
@@ -9,6 +9,10 @@ export default function PuntoCard({ punto, onEdit, onDelete }) {
           <button type="button" className="exh-icon-btn" onClick={() => onEdit(punto)}><Pencil size={14} /></button>
           <button type="button" className="exh-icon-btn" onClick={() => onDelete(punto.id)}><Trash2 size={14} /></button>
         </div>
+      </div>
+      <div className="exh-meta-row" style={{ marginBottom: 6 }}>
+        <span>Turnos asignados</span>
+        <strong>{turnosAsignados}</strong>
       </div>
       <div className="exh-card-body">{punto.observaciones || "Sin observaciones."}</div>
     </div>

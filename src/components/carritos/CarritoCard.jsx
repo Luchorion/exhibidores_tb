@@ -4,12 +4,12 @@ import { DIAS_CONTROL_FISICO, DIAS_REVISION_PUBLICACIONES, UBICACIONES_SUGERIDAS
 import { diasDesde, formatFechaCorta } from "../../utils/dates";
 import { estadoCarritoBadgeClass } from "../../utils/carritos";
 
-export default function CarritoCard({ carrito, onSave, onMarkControl, onMarkRevision }) {
+export default function CarritoCard({ carrito, portadasSugeridas, onSave, onMarkControl, onMarkRevision }) {
   const [editing, setEditing] = useState(false);
   const [draft, setDraft] = useState(null);
 
   function startEdit() {
-    setDraft({ estado: carrito.estado, ubicacion: carrito.ubicacion, notas: carrito.notas });
+    setDraft({ estado: carrito.estado, ubicacion: carrito.ubicacion, portada: carrito.portada || "", notas: carrito.notas });
     setEditing(true);
   }
 
@@ -47,6 +47,13 @@ export default function CarritoCard({ carrito, onSave, onMarkControl, onMarkRevi
           </datalist>
         </div>
         <div className="exh-field">
+          <label className="exh-label">Portada</label>
+          <input className="exh-input" list={`portadas-list-${carrito.id}`} value={draft.portada} onChange={(e) => setDraft({ ...draft, portada: e.target.value })} placeholder="Elegí una o escribí una nueva" />
+          <datalist id={`portadas-list-${carrito.id}`}>
+            {portadasSugeridas.map((p) => <option key={p} value={p} />)}
+          </datalist>
+        </div>
+        <div className="exh-field">
           <label className="exh-label">Notas</label>
           <textarea className="exh-textarea" value={draft.notas} onChange={(e) => setDraft({ ...draft, notas: e.target.value })} />
         </div>
@@ -67,6 +74,7 @@ export default function CarritoCard({ carrito, onSave, onMarkControl, onMarkRevi
         </div>
       </div>
       <div className="exh-meta-row"><span>Ubicación</span><strong>{carrito.ubicacion || "Sin asignar"}</strong></div>
+      <div className="exh-meta-row"><span>Portada</span><strong>{carrito.portada || "Sin registro"}</strong></div>
 
       <div className="exh-meta-row">
         <span>Control físico</span>

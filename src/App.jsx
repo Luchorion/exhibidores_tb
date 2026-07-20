@@ -1,7 +1,7 @@
 import { useMemo, useState } from "react";
 import { useAppData } from "./hooks/useAppData";
 import { uid } from "./utils/id";
-import { ordenarTurnos, agruparTurnosPorDia, computeConflictMap } from "./utils/turnos";
+import { ordenarTurnos, computeConflictMap } from "./utils/turnos";
 import { carritoVencido } from "./utils/carritos";
 import { DIAS_CONTROL_FISICO, DIAS_REVISION_PUBLICACIONES } from "./data/constants";
 import Header from "./components/Header";
@@ -26,7 +26,6 @@ export default function App() {
 
   // ---------- Turnos ----------
   const turnosOrdenados = useMemo(() => ordenarTurnos(turnos), [turnos]);
-  const turnosPorDia = useMemo(() => agruparTurnosPorDia(turnosOrdenados), [turnosOrdenados]);
   const conflictMap = useMemo(() => computeConflictMap(turnos), [turnos]);
   const totalTurnosConConflicto = Object.keys(conflictMap).length;
 
@@ -142,7 +141,6 @@ export default function App() {
             hermanosOrdenados={hermanosOrdenados}
             turnos={turnos}
             turnosOrdenados={turnosOrdenados}
-            turnosPorDia={turnosPorDia}
             conflictMap={conflictMap}
             onSaveTurno={saveTurno}
             onDeleteTurno={deleteTurno}
@@ -150,7 +148,7 @@ export default function App() {
         )}
 
         {tab === "puntos" && (
-          <PuntosTab puntos={puntos} onSavePunto={savePunto} onDeletePunto={deletePunto} />
+          <PuntosTab puntos={puntos} turnos={turnos} onSavePunto={savePunto} onDeletePunto={deletePunto} />
         )}
 
         {tab === "carritos" && (

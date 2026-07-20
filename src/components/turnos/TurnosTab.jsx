@@ -1,6 +1,7 @@
 import { useMemo, useState } from "react";
-import { Plus, X, List, LayoutGrid } from "lucide-react";
-import { computeConflictMap, describeConflicto as describeConflictoUtil } from "../../utils/turnos";
+import { Plus, X, List, LayoutGrid, Filter } from "lucide-react";
+import { FRECUENCIAS } from "../../data/constants";
+import { agruparTurnosPorDia, computeConflictMap, describeConflicto as describeConflictoUtil } from "../../utils/turnos";
 import TurnoForm from "./TurnoForm";
 import TurnoListView from "./TurnoListView";
 import TurnoGridView from "./TurnoGridView";
@@ -14,7 +15,6 @@ export default function TurnosTab({
   hermanosOrdenados,
   turnos,
   turnosOrdenados,
-  turnosPorDia,
   conflictMap,
   onSaveTurno,
   onDeleteTurno,
@@ -23,6 +23,17 @@ export default function TurnosTab({
   const [showForm, setShowForm] = useState(false);
   const [editingId, setEditingId] = useState(null);
   const [draft, setDraft] = useState(EMPTY_DRAFT);
+  const [filtroEstado, setFiltroEstado] = useState("todos");
+  const [filtroFrecuencia, setFiltroFrecuencia] = useState("todas");
+  const [filtroPunto, setFiltroPunto] = useState("todos");
+
+  const visibles = turnosOrdenados.filter((t) =>
+    (filtroEstado === "todos" || (t.estado || "confirmado") === filtroEstado) &&
+    (filtroFrecuencia === "todas" || (t.frecuencia || "Semanal") === filtroFrecuencia) &&
+    (filtroPunto === "todos" || t.puntoId === filtroPunto)
+  );
+  const visiblesPorDia = useMemo(() => agruparTurnosPorDia(visibles), [visibles]);
+  const hayFiltros = filtroEstado !== "todos" || filtroFrecuencia !== "todas" || filtroPunto !== "todos";
 
   function startNew() {
     setEditingId(null);
@@ -86,6 +97,35 @@ export default function TurnosTab({
         </div>
       </div>
 
+      {turnosOrdenados.length > 0 && (
+        <div className="exh-filter-bar">
+          <Filter size={13} style={{ color: "var(--muted)", flexShrink: 0 }} />
+          <select className="exh-select exh-select-sm" value={filtroEstado} onChange={(e) => setFiltroEstado(e.target.value)}>
+            <option value="todos">Todos los estados</option>
+            <option value="confirmado">Confirmados</option>
+            <option value="propuesto">Propuestos</option>
+          </select>
+          <select className="exh-select exh-select-sm" value={filtroFrecuencia} onChange={(e) => setFiltroFrecuencia(e.target.value)}>
+            <option value="todas">Todas las frecuencias</option>
+            {FRECUENCIAS.map((f) => <option key={f} value={f}>{f}</option>)}
+          </select>
+          <select className="exh-select exh-select-sm" value={filtroPunto} onChange={(e) => setFiltroPunto(e.target.value)}>
+            <option value="todos">Todos los puntos</option>
+            {puntos.map((p) => <option key={p.id} value={p.id}>{p.nombre}</option>)}
+          </select>
+          {hayFiltros && (
+            <button
+              type="button"
+              className="exh-btn exh-btn-ghost"
+              style={{ padding: "5px 10px", fontSize: 12 }}
+              onClick={() => { setFiltroEstado("todos"); setFiltroFrecuencia("todas"); setFiltroPunto("todos"); }}
+            >
+              Limpiar ({visibles.length}/{turnosOrdenados.length})
+            </button>
+          )}
+        </div>
+      )}
+
       {showForm && (
         <TurnoForm
           draft={draft}
@@ -103,9 +143,11 @@ export default function TurnosTab({
 
       {turnosOrdenados.length === 0 ? (
         <div className="exh-empty">Todavía no hay turnos programados. Agregá el primero con "Nuevo turno".</div>
+      ) : visibles.length === 0 ? (
+        <div className="exh-empty">Ningún turno coincide con los filtros elegidos.</div>
       ) : vista === "lista" ? (
         <TurnoListView
-          turnosPorDia={turnosPorDia}
+          turnosPorDia={visiblesPorDia}
           puntos={puntos}
           carritos={carritos}
           hermanos={hermanos}
@@ -116,7 +158,7 @@ export default function TurnosTab({
         />
       ) : (
         <TurnoGridView
-          turnosPorDia={turnosPorDia}
+          turnosPorDia={visiblesPorDia}
           puntos={puntos}
           carritos={carritos}
           hermanos={hermanos}
