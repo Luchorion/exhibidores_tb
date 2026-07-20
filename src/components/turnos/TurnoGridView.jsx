@@ -33,7 +33,13 @@ export default function TurnoGridView({ turnosPorDia, puntos, carritos, hermanos
                         {punto ? punto.nombre : "Sin punto"}
                         {t.estado === "propuesto" && <span className="exh-badge exh-badge-muted" style={{ marginLeft: 5, verticalAlign: 1 }}>Propuesto</span>}
                       </div>
-                      <div className="exh-grid-sub">{hermanosDelTurno.length ? hermanosDelTurno.map((h) => h.nombre).join(", ") : "Sin hermanos"}</div>
+                      {hermanosDelTurno.length ? (
+                        <div className="exh-personas">
+                          {hermanosDelTurno.map((h) => <span className="exh-persona-tag" key={h.id}>{h.nombre}</span>)}
+                        </div>
+                      ) : (
+                        <div className="exh-grid-sub">Sin hermanos</div>
+                      )}
                       <div className="exh-grid-sub">{carritosDelTurno.length ? carritosDelTurno.map((c) => `C${c.numero}`).join(", ") : "Sin carrito"} · {t.frecuencia}</div>
                     </div>
                   );

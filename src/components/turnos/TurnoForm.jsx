@@ -166,7 +166,7 @@ export default function TurnoForm({
       </div>
       <div className="exh-form-actions">
         <button type="button" className="exh-btn exh-btn-amber" onClick={onSave}><Check size={15} /> {editingTurnoId ? "Guardar cambios" : "Guardar turno"}</button>
-        {editingTurnoId && <button type="button" className="exh-btn exh-btn-ghost" onClick={onCancel}>Cancelar edición</button>}
+        <button type="button" className="exh-btn exh-btn-ghost" onClick={onCancel}>Cancelar</button>
       </div>
     </div>
   );

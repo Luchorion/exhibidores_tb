@@ -101,6 +101,7 @@ export default function App() {
   const idsConTurno = new Set(turnos.flatMap((t) => t.hermanoIds || []));
   const aprobadosSinTurno = hermanos.filter((h) => h.estado === "aprobado" && !idsConTurno.has(h.id)).length;
   const operativos = carritos.filter((c) => c.estado === "operativo").length;
+  const turnosConfirmados = turnos.filter((t) => (t.estado || "confirmado") === "confirmado").length;
   const carritosVencidos = carritos.filter((c) => carritoVencido(c, DIAS_CONTROL_FISICO, DIAS_REVISION_PUBLICACIONES)).length;
 
   if (loading) {
@@ -119,6 +120,7 @@ export default function App() {
         aprobadosCount={aprobadosCount}
         totalHermanos={hermanos.length}
         aprobadosSinTurno={aprobadosSinTurno}
+        turnosConfirmados={turnosConfirmados}
         turnosProgramados={turnos.length}
         carritosVencidos={carritosVencidos}
         totalTurnosConConflicto={totalTurnosConConflicto}

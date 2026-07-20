@@ -1,7 +1,8 @@
 import { useMemo, useState } from "react";
-import { Plus, X, List, LayoutGrid, Filter } from "lucide-react";
+import { Plus, List, LayoutGrid, Filter } from "lucide-react";
 import { FRECUENCIAS } from "../../data/constants";
 import { agruparTurnosPorDia, computeConflictMap, describeConflicto as describeConflictoUtil } from "../../utils/turnos";
+import Modal from "../Modal";
 import TurnoForm from "./TurnoForm";
 import TurnoListView from "./TurnoListView";
 import TurnoGridView from "./TurnoGridView";
@@ -90,9 +91,8 @@ export default function TurnosTab({
             <button type="button" className={`exh-toggle-btn ${vista === "lista" ? "active" : ""}`} onClick={() => setVista("lista")}><List size={13} /> Lista</button>
             <button type="button" className={`exh-toggle-btn ${vista === "grilla" ? "active" : ""}`} onClick={() => setVista("grilla")}><LayoutGrid size={13} /> Grilla</button>
           </div>
-          <button type="button" className="exh-btn exh-btn-amber" onClick={() => (showForm ? cancelForm() : startNew())}>
-            {showForm ? <X size={15} /> : <Plus size={15} />}
-            {showForm ? "Cancelar" : "Nuevo turno"}
+          <button type="button" className="exh-btn exh-btn-amber" onClick={startNew}>
+            <Plus size={15} /> Nuevo turno
           </button>
         </div>
       </div>
@@ -127,18 +127,20 @@ export default function TurnosTab({
       )}
 
       {showForm && (
-        <TurnoForm
-          draft={draft}
-          setDraft={setDraft}
-          puntos={puntos}
-          carritos={carritos}
-          hermanosOrdenados={hermanosOrdenados}
-          editingTurnoId={editingId}
-          conflictos={draftConflictos}
-          describeConflicto={describeConflicto}
-          onSave={handleSave}
-          onCancel={cancelForm}
-        />
+        <Modal title={editingId ? "Editar turno" : "Nuevo turno"} onClose={cancelForm}>
+          <TurnoForm
+            draft={draft}
+            setDraft={setDraft}
+            puntos={puntos}
+            carritos={carritos}
+            hermanosOrdenados={hermanosOrdenados}
+            editingTurnoId={editingId}
+            conflictos={draftConflictos}
+            describeConflicto={describeConflicto}
+            onSave={handleSave}
+            onCancel={cancelForm}
+          />
+        </Modal>
       )}
 
       {turnosOrdenados.length === 0 ? (

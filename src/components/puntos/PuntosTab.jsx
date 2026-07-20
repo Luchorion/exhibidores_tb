@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Plus } from "lucide-react";
+import Modal from "../Modal";
 import PuntoForm from "./PuntoForm";
 import PuntoCard from "./PuntoCard";
 
@@ -42,7 +43,9 @@ export default function PuntosTab({ puntos, turnos, onSavePunto, onDeletePunto }
       </div>
 
       {showForm && (
-        <PuntoForm draft={draft} setDraft={setDraft} onSave={handleSave} onCancel={cancelForm} />
+        <Modal title={editingId ? "Editar punto" : "Nuevo punto"} onClose={cancelForm}>
+          <PuntoForm draft={draft} setDraft={setDraft} onSave={handleSave} onCancel={cancelForm} />
+        </Modal>
       )}
 
       <div className="exh-cards">

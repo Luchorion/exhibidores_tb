@@ -15,12 +15,14 @@ export default function TurnoListView({ turnosPorDia, puntos, carritos, hermanos
             <div className="exh-time"><Clock size={13} style={{ marginRight: 4, verticalAlign: -2 }} />{t.horaInicio}{t.horaFin ? `–${t.horaFin}` : ""}</div>
             <div className="exh-row-main">
               <div className="exh-row-point">{punto ? punto.nombre : "Punto sin definir"}</div>
-              <div className="exh-row-sub">
-                {hermanosDelTurno.length > 0
-                  ? hermanosDelTurno.map((h) => h.nombre).join(", ")
-                  : (t.conductorLibre || "Sin hermanos asignados")}
-                {t.notas ? ` · ${t.notas}` : ""}
-              </div>
+              {hermanosDelTurno.length > 0 ? (
+                <div className="exh-personas">
+                  {hermanosDelTurno.map((h) => <span className="exh-persona-tag" key={h.id}>{h.nombre}</span>)}
+                </div>
+              ) : (
+                <div className="exh-row-sub">{t.conductorLibre || "Sin hermanos asignados"}</div>
+              )}
+              {t.notas && <div className="exh-row-sub">{t.notas}</div>}
               <div className="exh-row-tags">
                 {t.estado === "propuesto" && <span className="exh-badge exh-badge-muted">Propuesto</span>}
                 <span className="exh-badge exh-badge-amber">{t.frecuencia || "Semanal"}</span>

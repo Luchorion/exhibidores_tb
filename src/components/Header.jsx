@@ -4,6 +4,7 @@ export default function Header({
   aprobadosCount,
   totalHermanos,
   aprobadosSinTurno,
+  turnosConfirmados,
   turnosProgramados,
   carritosVencidos,
   totalTurnosConConflicto,
@@ -24,9 +25,9 @@ export default function Header({
           <p className="exh-board-label">Aprobados sin turno</p>
           <p className={`exh-board-value ${aprobadosSinTurno > 0 ? "warn" : ""}`}>{aprobadosSinTurno}</p>
         </div>
-        <div className="exh-board-cell">
-          <p className="exh-board-label">Turnos programados</p>
-          <p className="exh-board-value">{turnosProgramados}</p>
+        <div className="exh-board-cell" title="Turnos confirmados / total programado (incluye propuestos)">
+          <p className="exh-board-label">Turnos confirmados</p>
+          <p className="exh-board-value">{turnosConfirmados} / {turnosProgramados}</p>
         </div>
         <div className="exh-board-cell">
           <p className="exh-board-label">Mantenimiento vencido</p>
