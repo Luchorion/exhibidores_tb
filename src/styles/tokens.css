@@ -1,0 +1,32 @@
+:root {
+  --ink: #16213A;
+  --paper: #EEF1EF;
+  --paper-raised: #F8F9F7;
+  --line: #C7CFC9;
+  --amber: #E2A73B;
+  --amber-dark: #B9832A;
+  --rust: #C1523A;
+  --slate: #3E6E92;
+  --slate-dark: #2C5069;
+  --green: #4C7A5C;
+  --muted: #667085;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+.exh-root {
+  background: var(--paper);
+  color: var(--ink);
+  font-family: 'IBM Plex Sans', sans-serif;
+  min-height: 100vh;
+  padding: 0 0 60px 0;
+}
+
+.exh-loading {
+  padding: 60px;
+  text-align: center;
+  color: var(--muted);
+  font-family: 'IBM Plex Mono', monospace;
+}
