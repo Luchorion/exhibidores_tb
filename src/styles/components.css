@@ -129,9 +129,9 @@
 }
 
 .exh-content {
-  max-width: 1000px;
+  max-width: 1600px;
   margin: 0 auto;
-  padding: 24px;
+  padding: 24px 32px;
 }
 
 .exh-section-head {
@@ -191,7 +191,21 @@
 }
 .exh-icon-btn:hover { color: var(--ink); }
 
-.exh-date-group { margin-bottom: 22px; }
+/* En pantallas anchas, los días se acomodan en varias columnas tipo
+   tablón en vez de una sola lista larga. column-width es un mínimo: el
+   navegador calcula solo cuántas columnas entran, así que en celular o
+   tablet (donde no entra ni una columna de 460px con margen) se ve igual
+   que antes, una sola columna, sin necesidad de un media query aparte. */
+.exh-days-board {
+  column-width: 460px;
+  column-gap: 28px;
+}
+
+.exh-date-group {
+  margin-bottom: 22px;
+  break-inside: avoid-column;
+  -webkit-column-break-inside: avoid;
+}
 
 .exh-date-label {
   font-family: 'IBM Plex Mono', monospace;
