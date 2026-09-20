@@ -73,6 +73,19 @@ export default function App() {
     const next = carritos.map((c) => (c.id === id ? { ...c, ...patch } : c));
     setCarritos(next);
     await persist(KEYS.carritos, next);
+
+    // Un carrito de repuesto no está en la calle, así que no puede seguir
+    // asignado a ningún turno. Si se acaba de marcar así, se lo saca de
+    // donde estuviera.
+    if (patch.estado === "repuesto") {
+      const nextTurnos = turnos.map((t) =>
+        (t.carritoIds || []).includes(id) ? { ...t, carritoIds: t.carritoIds.filter((cid) => cid !== id) } : t
+      );
+      if (nextTurnos.some((t, i) => t !== turnos[i])) {
+        setTurnos(nextTurnos);
+        await persist(KEYS.turnos, nextTurnos);
+      }
+    }
   }
 
   async function marcarControlFisicoHoy(carrito) {

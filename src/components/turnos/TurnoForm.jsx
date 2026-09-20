@@ -78,14 +78,14 @@ export default function TurnoForm({
         <div className="exh-field full">
           <label className="exh-label">Carritos ({draft.carritoIds.length} seleccionados)</label>
           <div className="exh-chip-group">
-            {carritos.filter((c) => c.estado !== "pendiente").map((c) => (
+            {carritos.filter((c) => c.estado === "operativo").map((c) => (
               <button
                 type="button"
                 key={c.id}
                 className={`exh-chip ${draft.carritoIds.includes(c.id) ? "selected" : ""}`}
                 onClick={() => setDraft({ ...draft, carritoIds: toggleInArray(draft.carritoIds, c.id) })}
               >
-                Carrito {c.numero}{c.estado === "repuesto" ? " (repuesto)" : ""}
+                Carrito {c.numero}
               </button>
             ))}
           </div>
