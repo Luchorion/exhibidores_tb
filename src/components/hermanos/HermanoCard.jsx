@@ -3,14 +3,14 @@ import { formatFechaCorta } from "../../utils/dates";
 import { estadoHermanoBadgeClass, estadoHermanoLabel } from "../../utils/hermanos";
 import { turnosDeHermano } from "../../utils/turnos";
 import { useEdicion } from "../../context/edicion";
+import { useInfoPanel } from "../../context/infoPanel";
 
 export default function HermanoCard({ hermano, puntos, turnos, onEdit, onDelete }) {
   const modoEdicion = useEdicion();
-  const nombresPuntos = (hermano.puntosPreferidos || [])
+  const abrirInfo = useInfoPanel();
+  const puntosPreferidos = (hermano.puntosPreferidos || [])
     .map((pid) => puntos.find((p) => p.id === pid))
-    .filter(Boolean)
-    .map((p) => p.nombre)
-    .join(", ");
+    .filter(Boolean);
 
   const turnosDelHermano = turnosDeHermano(turnos, hermano.id);
 
@@ -30,7 +30,22 @@ export default function HermanoCard({ hermano, puntos, turnos, onEdit, onDelete 
       </div>
       <div className="exh-meta-row"><span>Fecha aprobación</span><strong>{hermano.fechaAprobacion ? formatFechaCorta(hermano.fechaAprobacion) : "Sin registro"}</strong></div>
       <div className="exh-meta-row"><span>Disponibilidad</span><strong>{hermano.disponibilidad && hermano.disponibilidad.length ? hermano.disponibilidad.join(", ") : "Sin definir"}</strong></div>
-      <div className="exh-meta-row"><span>Puntos</span><strong>{nombresPuntos || "Sin preferencia"}</strong></div>
+
+      <div className="exh-meta-row">
+        <span>Puntos</span>
+        {puntosPreferidos.length === 0 ? (
+          <strong>Sin preferencia</strong>
+        ) : (
+          <strong>
+            {puntosPreferidos.map((p, i) => (
+              <span key={p.id}>
+                {i > 0 && ", "}
+                <button type="button" className="exh-link" style={{ display: "inline", width: "auto" }} onClick={() => abrirInfo("punto", p.id)}>{p.nombre}</button>
+              </span>
+            ))}
+          </strong>
+        )}
+      </div>
 
       <div style={{ marginTop: 10 }}>
         <span className="exh-label">Turnos asignados ({turnosDelHermano.length})</span>
@@ -45,7 +60,12 @@ export default function HermanoCard({ hermano, puntos, turnos, onEdit, onDelete 
                   <Clock size={12} style={{ flexShrink: 0, verticalAlign: -1 }} />
                   <strong>{t.dia}</strong>
                   <span>{t.horaInicio}{t.horaFin ? `–${t.horaFin}` : ""}</span>
-                  <span>· {punto ? punto.nombre : "Punto sin definir"}</span>
+                  <span>·</span>
+                  {punto ? (
+                    <button type="button" className="exh-link" style={{ display: "inline", width: "auto" }} onClick={() => abrirInfo("punto", punto.id)}>{punto.nombre}</button>
+                  ) : (
+                    <span>Punto sin definir</span>
+                  )}
                   <span className="exh-badge exh-badge-amber">{t.frecuencia}</span>
                 </div>
               );

@@ -326,6 +326,9 @@
   padding: 14px;
 }
 
+.exh-card-clickable { cursor: pointer; transition: box-shadow 0.1s; }
+.exh-card-clickable:hover { box-shadow: 0 2px 10px rgba(22,33,58,0.12); }
+
 .exh-card-accent-green { border-left: 4px solid var(--green); }
 .exh-card-accent-amber { border-left: 4px solid var(--amber); }
 .exh-card-accent-muted { border-left: 4px solid var(--muted); }
@@ -411,14 +414,56 @@
 .exh-persona-tag {
   font-size: 11.5px;
   font-weight: 500;
+  font-family: inherit;
   padding: 2px 8px;
+  border: none;
   border-radius: 10px;
   background: rgba(62,110,146,0.10);
   color: var(--slate-dark);
   white-space: nowrap;
   display: inline-flex;
   align-items: center;
+  cursor: pointer;
 }
+.exh-persona-tag:hover { background: rgba(62,110,146,0.22); }
+
+/* Texto que actúa como link: mismo tipo de letra que el elemento que
+   reemplaza (no toca font-size/weight), sin fondo ni borde de botón. */
+.exh-link {
+  display: block;
+  width: 100%;
+  background: none;
+  border: none;
+  padding: 0;
+  margin: 0;
+  color: inherit;
+  font-family: inherit;
+  line-height: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+.exh-link:hover { text-decoration: underline; }
+
+/* Badge clickeable (p.ej. "Carrito 3" dentro de un turno): mismos colores
+   por variante que .exh-badge, solo saca el look de <button>. */
+.exh-badge-link { border: none; font-family: inherit; cursor: pointer; }
+.exh-badge-link:hover { filter: brightness(0.93); }
+
+.exh-info-section { margin-top: 12px; }
+.exh-info-section:first-child { margin-top: 0; }
+
+.exh-mini-turno {
+  background: var(--paper-raised);
+  border: 1px solid var(--line);
+  border-left: 3px solid var(--slate);
+  border-radius: 3px;
+  padding: 8px 10px;
+  margin-bottom: 6px;
+  font-size: 12.5px;
+}
+.exh-mini-turno.propuesto { border-left-color: var(--amber); background: rgba(226,167,59,0.07); }
+.exh-mini-turno-head { display: flex; align-items: center; gap: 6px; font-family: 'IBM Plex Mono', monospace; font-weight: 600; }
+.exh-mini-turno-point { margin-top: 4px; }
 
 .exh-filter-bar {
   display: flex;

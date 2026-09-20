@@ -4,10 +4,12 @@ import { DIAS_CONTROL_FISICO, DIAS_REVISION_PUBLICACIONES, UBICACIONES_SUGERIDAS
 import { diasDesde, formatFechaCorta } from "../../utils/dates";
 import { carritoPlate, estadoCarritoAccentClass, estadoCarritoBadgeClass } from "../../utils/carritos";
 import { useEdicion } from "../../context/edicion";
+import { useInfoPanel } from "../../context/infoPanel";
 import Modal from "../Modal";
 
 export default function CarritoCard({ carrito, portadasSugeridas, onSave, onMarkControl, onMarkRevision }) {
   const modoEdicion = useEdicion();
+  const abrirInfo = useInfoPanel();
   const [editing, setEditing] = useState(false);
   const [draft, setDraft] = useState(null);
 
@@ -29,8 +31,14 @@ export default function CarritoCard({ carrito, portadasSugeridas, onSave, onMark
   const pubVencida = esOperativo && (diasPub === null || diasPub > DIAS_REVISION_PUBLICACIONES);
 
   return (
-    <div className={`exh-card ${estadoCarritoAccentClass(carrito.estado)}`}>
+    <div
+      className={`exh-card exh-card-clickable ${estadoCarritoAccentClass(carrito.estado)}`}
+      onClick={() => abrirInfo("carrito", carrito.id)}
+      title="Tocar para ver los turnos de este carrito"
+    >
       {editing && (
+        // eslint-disable-next-line jsx-a11y/no-static-element-interactions
+        <div onClick={(e) => e.stopPropagation()}>
         <Modal title={`Editar carrito ${carritoPlate(carrito)}`} onClose={() => setEditing(false)}>
           <div className="exh-form">
             <div className="exh-form-grid">
@@ -67,12 +75,13 @@ export default function CarritoCard({ carrito, portadasSugeridas, onSave, onMark
             </div>
           </div>
         </Modal>
+        </div>
       )}
       <div className="exh-card-head">
         <span className="exh-plate">{carritoPlate(carrito)}</span>
         <div className="exh-card-actions">
           <span className={`exh-badge ${estadoCarritoBadgeClass(carrito.estado)}`}>{carrito.estado}</span>
-          {modoEdicion && <button type="button" className="exh-icon-btn" onClick={startEdit}><Pencil size={14} /></button>}
+          {modoEdicion && <button type="button" className="exh-icon-btn" onClick={(e) => { e.stopPropagation(); startEdit(); }}><Pencil size={14} /></button>}
         </div>
       </div>
       <div className="exh-meta-row"><span>Ubicación</span><strong>{carrito.ubicacion || "Sin asignar"}</strong></div>
@@ -92,7 +101,7 @@ export default function CarritoCard({ carrito, portadasSugeridas, onSave, onMark
           )}
           {modoEdicion && (
             <div className="exh-form-actions" style={{ marginTop: 8 }}>
-              <button type="button" className="exh-btn exh-btn-ghost" onClick={() => onMarkControl(carrito)}><Wrench size={13} /> Registrar control hoy</button>
+              <button type="button" className="exh-btn exh-btn-ghost" onClick={(e) => { e.stopPropagation(); onMarkControl(carrito); }}><Wrench size={13} /> Registrar control hoy</button>
             </div>
           )}
 
@@ -108,7 +117,7 @@ export default function CarritoCard({ carrito, portadasSugeridas, onSave, onMark
           )}
           {modoEdicion && (
             <div className="exh-form-actions" style={{ marginTop: 8 }}>
-              <button type="button" className="exh-btn exh-btn-ghost" onClick={() => onMarkRevision(carrito)}><Wrench size={13} /> Registrar revisión hoy</button>
+              <button type="button" className="exh-btn exh-btn-ghost" onClick={(e) => { e.stopPropagation(); onMarkRevision(carrito); }}><Wrench size={13} /> Registrar revisión hoy</button>
             </div>
           )}
         </>

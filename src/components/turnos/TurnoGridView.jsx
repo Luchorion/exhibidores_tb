@@ -1,9 +1,18 @@
 import { AlertTriangle } from "lucide-react";
 import { DIAS_SEMANA } from "../../data/constants";
 import { useEdicion } from "../../context/edicion";
+import { useInfoPanel } from "../../context/infoPanel";
+import { estadoHermanoLabel } from "../../utils/hermanos";
 
 export default function TurnoGridView({ turnosPorDia, puntos, carritos, hermanos, conflictMap, onEdit }) {
   const modoEdicion = useEdicion();
+  const abrirInfo = useInfoPanel();
+
+  function abrirInfoDesdeCard(e, tipo, id) {
+    e.stopPropagation();
+    abrirInfo(tipo, id);
+  }
+
   return (
     <div className="exh-grid-wrap">
       <div className="exh-grid">
@@ -33,17 +42,36 @@ export default function TurnoGridView({ turnosPorDia, puntos, carritos, hermanos
                         {conflictosTurno.length > 0 && <AlertTriangle size={11} style={{ verticalAlign: -1, color: "var(--rust)" }} />}
                       </div>
                       <div className="exh-grid-point">
-                        {punto ? punto.nombre : "Sin punto"}
+                        {punto ? (
+                          <button type="button" className="exh-link" onClick={(e) => abrirInfoDesdeCard(e, "punto", punto.id)}>{punto.nombre}</button>
+                        ) : "Sin punto"}
                         {esPropuesto && <span className="exh-badge exh-badge-amber" style={{ marginLeft: 5, verticalAlign: 1 }}>Propuesto</span>}
                       </div>
                       {hermanosDelTurno.length ? (
                         <div className="exh-personas">
-                          {hermanosDelTurno.map((h) => <span className="exh-persona-tag" key={h.id}>{h.nombre}</span>)}
+                          {hermanosDelTurno.map((h) => (
+                            <button
+                              key={h.id}
+                              type="button"
+                              className="exh-persona-tag"
+                              title={estadoHermanoLabel(h.estado)}
+                              onClick={(e) => abrirInfoDesdeCard(e, "hermano", h.id)}
+                            >
+                              {h.nombre}
+                            </button>
+                          ))}
                         </div>
                       ) : (
                         <div className="exh-grid-sub">Sin hermanos</div>
                       )}
-                      <div className="exh-grid-sub">{carritosDelTurno.length ? carritosDelTurno.map((c) => `C${c.numero}`).join(", ") : "Sin carrito"} · {t.frecuencia}</div>
+                      <div className="exh-grid-sub">
+                        {carritosDelTurno.length ? carritosDelTurno.map((c, i) => (
+                          <span key={c.id}>
+                            {i > 0 && ", "}
+                            <button type="button" className="exh-link" style={{ display: "inline", width: "auto" }} onClick={(e) => abrirInfoDesdeCard(e, "carrito", c.id)}>C{c.numero}</button>
+                          </span>
+                        )) : "Sin carrito"} · {t.frecuencia}
+                      </div>
                     </div>
                   );
                 })

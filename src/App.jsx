@@ -1,5 +1,6 @@
 import { useMemo, useState } from "react";
 import { EdicionContext } from "./context/edicion";
+import { InfoPanelContext } from "./context/infoPanel";
 import { useAppData } from "./hooks/useAppData";
 import { uid } from "./utils/id";
 import { ordenarTurnos, computeConflictMap } from "./utils/turnos";
@@ -11,10 +12,18 @@ import TurnosTab from "./components/turnos/TurnosTab";
 import PuntosTab from "./components/puntos/PuntosTab";
 import CarritosTab from "./components/carritos/CarritosTab";
 import HermanosTab from "./components/hermanos/HermanosTab";
+import HermanoInfoModal from "./components/info/HermanoInfoModal";
+import PuntoInfoModal from "./components/info/PuntoInfoModal";
+import CarritoInfoModal from "./components/info/CarritoInfoModal";
 
 export default function App() {
   const [tab, setTab] = useState("turnos");
   const [modoEdicion, setModoEdicion] = useState(() => localStorage.getItem("exh-modo-edicion") === "1");
+  const [infoAbierta, setInfoAbierta] = useState(null); // { tipo: "hermano"|"punto"|"carrito", id }
+
+  function abrirInfo(tipo, id) {
+    setInfoAbierta({ tipo, id });
+  }
 
   function toggleEdicion() {
     setModoEdicion((prev) => {
@@ -137,6 +146,7 @@ export default function App() {
 
   return (
     <EdicionContext.Provider value={modoEdicion}>
+    <InfoPanelContext.Provider value={abrirInfo}>
     <div className="exh-root">
       <Header
         operativos={operativos}
@@ -198,7 +208,39 @@ export default function App() {
           />
         )}
       </main>
+
+      {infoAbierta?.tipo === "hermano" && (
+        <HermanoInfoModal
+          hermanoId={infoAbierta.id}
+          hermanos={hermanos}
+          puntos={puntos}
+          carritos={carritos}
+          turnos={turnos}
+          onClose={() => setInfoAbierta(null)}
+        />
+      )}
+      {infoAbierta?.tipo === "punto" && (
+        <PuntoInfoModal
+          puntoId={infoAbierta.id}
+          puntos={puntos}
+          hermanos={hermanos}
+          carritos={carritos}
+          turnos={turnos}
+          onClose={() => setInfoAbierta(null)}
+        />
+      )}
+      {infoAbierta?.tipo === "carrito" && (
+        <CarritoInfoModal
+          carritoId={infoAbierta.id}
+          carritos={carritos}
+          hermanos={hermanos}
+          puntos={puntos}
+          turnos={turnos}
+          onClose={() => setInfoAbierta(null)}
+        />
+      )}
     </div>
+    </InfoPanelContext.Provider>
     </EdicionContext.Provider>
   );
 }

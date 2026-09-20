@@ -1,9 +1,12 @@
 import { Clock, AlertTriangle, Pencil, Trash2 } from "lucide-react";
 import { DIAS_SEMANA } from "../../data/constants";
 import { useEdicion } from "../../context/edicion";
+import { useInfoPanel } from "../../context/infoPanel";
+import { estadoHermanoLabel } from "../../utils/hermanos";
 
 export default function TurnoListView({ turnosPorDia, puntos, carritos, hermanos, conflictMap, describeConflicto, onEdit, onDelete }) {
   const modoEdicion = useEdicion();
+  const abrirInfo = useInfoPanel();
   return DIAS_SEMANA.filter((d) => turnosPorDia[d] && turnosPorDia[d].length > 0).map((dia) => (
     <div className="exh-date-group" key={dia}>
       <div className="exh-date-label">{dia}</div>
@@ -17,10 +20,24 @@ export default function TurnoListView({ turnosPorDia, puntos, carritos, hermanos
           <div className={`exh-row ${esPropuesto ? "propuesto" : ""} ${conflictosTurno.length ? "conflicto" : ""}`} key={t.id}>
             <div className="exh-time"><Clock size={13} style={{ marginRight: 4, verticalAlign: -2 }} />{t.horaInicio}{t.horaFin ? `–${t.horaFin}` : ""}</div>
             <div className="exh-row-main">
-              <div className="exh-row-point">{punto ? punto.nombre : "Punto sin definir"}</div>
+              {punto ? (
+                <button type="button" className="exh-row-point exh-link" onClick={() => abrirInfo("punto", punto.id)}>{punto.nombre}</button>
+              ) : (
+                <div className="exh-row-point" style={{ color: "var(--muted)" }}>Punto sin definir</div>
+              )}
               {hermanosDelTurno.length > 0 ? (
                 <div className="exh-personas">
-                  {hermanosDelTurno.map((h) => <span className="exh-persona-tag" key={h.id}>{h.nombre}</span>)}
+                  {hermanosDelTurno.map((h) => (
+                    <button
+                      key={h.id}
+                      type="button"
+                      className="exh-persona-tag"
+                      title={estadoHermanoLabel(h.estado)}
+                      onClick={() => abrirInfo("hermano", h.id)}
+                    >
+                      {h.nombre}
+                    </button>
+                  ))}
                 </div>
               ) : (
                 <div className="exh-row-sub">{t.conductorLibre || "Sin hermanos asignados"}</div>
@@ -29,7 +46,16 @@ export default function TurnoListView({ turnosPorDia, puntos, carritos, hermanos
               <div className="exh-row-tags">
                 {esPropuesto && <span className="exh-badge exh-badge-amber">Propuesto</span>}
                 <span className="exh-badge exh-badge-amber">{t.frecuencia || "Semanal"}</span>
-                {carritosDelTurno.map((c) => <span className="exh-badge exh-badge-slate" key={c.id}>Carrito {c.numero}</span>)}
+                {carritosDelTurno.map((c) => (
+                  <button
+                    key={c.id}
+                    type="button"
+                    className="exh-badge exh-badge-slate exh-badge-link"
+                    onClick={() => abrirInfo("carrito", c.id)}
+                  >
+                    Carrito {c.numero}
+                  </button>
+                ))}
               </div>
               {conflictosTurno.length > 0 && (
                 <div className="exh-warn-box">
