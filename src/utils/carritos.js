@@ -29,7 +29,10 @@ export function estadoCarritoAccentClass(estado) {
   return `exh-card-accent-${estadoCarritoColor(estado)}`;
 }
 
+// Repuesto y pendiente no están en servicio, así que no tienen control
+// físico ni revisión de publicaciones que vencer.
 export function carritoVencido(c, diasControlLimite, diasPubLimite) {
+  if (c.estado !== "operativo") return false;
   const diasControl = diasDesde(c.ultimoControlFisico);
   const diasPub = diasDesde(c.ultimaRevisionPublicaciones);
   return (

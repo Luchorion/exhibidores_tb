@@ -22,10 +22,11 @@ export default function CarritoCard({ carrito, portadasSugeridas, onSave, onMark
     setDraft(null);
   }
 
+  const esOperativo = carrito.estado === "operativo";
   const diasControl = diasDesde(carrito.ultimoControlFisico);
   const diasPub = diasDesde(carrito.ultimaRevisionPublicaciones);
-  const controlVencido = diasControl === null || diasControl > DIAS_CONTROL_FISICO;
-  const pubVencida = diasPub === null || diasPub > DIAS_REVISION_PUBLICACIONES;
+  const controlVencido = esOperativo && (diasControl === null || diasControl > DIAS_CONTROL_FISICO);
+  const pubVencida = esOperativo && (diasPub === null || diasPub > DIAS_REVISION_PUBLICACIONES);
 
   return (
     <div className={`exh-card ${estadoCarritoAccentClass(carrito.estado)}`}>
@@ -77,36 +78,40 @@ export default function CarritoCard({ carrito, portadasSugeridas, onSave, onMark
       <div className="exh-meta-row"><span>Ubicación</span><strong>{carrito.ubicacion || "Sin asignar"}</strong></div>
       <div className="exh-meta-row"><span>Portada</span><strong>{carrito.portada || "Sin registro"}</strong></div>
 
-      <div className="exh-meta-row">
-        <span>Control físico</span>
-        <strong>{carrito.ultimoControlFisico ? formatFechaCorta(carrito.ultimoControlFisico) : "Sin registro"}</strong>
-      </div>
-      {controlVencido && (
-        <div className="exh-warn-box" style={{ marginTop: 6 }}>
-          <AlertTriangle size={14} style={{ flexShrink: 0 }} />
-          <span>Vencido: corresponde controlarlo cada {DIAS_CONTROL_FISICO} días.</span>
-        </div>
-      )}
-      {modoEdicion && (
-        <div className="exh-form-actions" style={{ marginTop: 8 }}>
-          <button type="button" className="exh-btn exh-btn-ghost" onClick={() => onMarkControl(carrito)}><Wrench size={13} /> Registrar control hoy</button>
-        </div>
-      )}
+      {esOperativo && (
+        <>
+          <div className="exh-meta-row">
+            <span>Control físico</span>
+            <strong>{carrito.ultimoControlFisico ? formatFechaCorta(carrito.ultimoControlFisico) : "Sin registro"}</strong>
+          </div>
+          {controlVencido && (
+            <div className="exh-warn-box" style={{ marginTop: 6 }}>
+              <AlertTriangle size={14} style={{ flexShrink: 0 }} />
+              <span>Vencido: corresponde controlarlo cada {DIAS_CONTROL_FISICO} días.</span>
+            </div>
+          )}
+          {modoEdicion && (
+            <div className="exh-form-actions" style={{ marginTop: 8 }}>
+              <button type="button" className="exh-btn exh-btn-ghost" onClick={() => onMarkControl(carrito)}><Wrench size={13} /> Registrar control hoy</button>
+            </div>
+          )}
 
-      <div className="exh-meta-row" style={{ marginTop: 10 }}>
-        <span>Revisión publicaciones</span>
-        <strong>{carrito.ultimaRevisionPublicaciones ? formatFechaCorta(carrito.ultimaRevisionPublicaciones) : "Sin registro"}</strong>
-      </div>
-      {pubVencida && (
-        <div className="exh-warn-box" style={{ marginTop: 6 }}>
-          <AlertTriangle size={14} style={{ flexShrink: 0 }} />
-          <span>Vencida: corresponde revisarla cada {DIAS_REVISION_PUBLICACIONES} días (~2 meses).</span>
-        </div>
-      )}
-      {modoEdicion && (
-        <div className="exh-form-actions" style={{ marginTop: 8 }}>
-          <button type="button" className="exh-btn exh-btn-ghost" onClick={() => onMarkRevision(carrito)}><Wrench size={13} /> Registrar revisión hoy</button>
-        </div>
+          <div className="exh-meta-row" style={{ marginTop: 10 }}>
+            <span>Revisión publicaciones</span>
+            <strong>{carrito.ultimaRevisionPublicaciones ? formatFechaCorta(carrito.ultimaRevisionPublicaciones) : "Sin registro"}</strong>
+          </div>
+          {pubVencida && (
+            <div className="exh-warn-box" style={{ marginTop: 6 }}>
+              <AlertTriangle size={14} style={{ flexShrink: 0 }} />
+              <span>Vencida: corresponde revisarla cada {DIAS_REVISION_PUBLICACIONES} días (~2 meses).</span>
+            </div>
+          )}
+          {modoEdicion && (
+            <div className="exh-form-actions" style={{ marginTop: 8 }}>
+              <button type="button" className="exh-btn exh-btn-ghost" onClick={() => onMarkRevision(carrito)}><Wrench size={13} /> Registrar revisión hoy</button>
+            </div>
+          )}
+        </>
       )}
 
       {carrito.notas && <div className="exh-card-body" style={{ marginTop: 10 }}>{carrito.notas}</div>}
