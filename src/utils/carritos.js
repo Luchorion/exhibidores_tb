@@ -29,6 +29,12 @@ export function estadoCarritoAccentClass(estado) {
   return `exh-card-accent-${estadoCarritoColor(estado)}`;
 }
 
+// Solo los operativos están en la calle y tienen un número físico
+// pegado; repuesto y pendiente no tienen carrito asignado todavía.
+export function carritoPlate(carrito) {
+  return carrito.numero != null ? String(carrito.numero).padStart(2, "0") : "—";
+}
+
 // Repuesto y pendiente no están en servicio, así que no tienen control
 // físico ni revisión de publicaciones que vencer.
 export function carritoVencido(c, diasControlLimite, diasPubLimite) {

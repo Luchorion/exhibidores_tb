@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Pencil, Check, Wrench, AlertTriangle } from "lucide-react";
 import { DIAS_CONTROL_FISICO, DIAS_REVISION_PUBLICACIONES, UBICACIONES_SUGERIDAS } from "../../data/constants";
 import { diasDesde, formatFechaCorta } from "../../utils/dates";
-import { estadoCarritoAccentClass, estadoCarritoBadgeClass } from "../../utils/carritos";
+import { carritoPlate, estadoCarritoAccentClass, estadoCarritoBadgeClass } from "../../utils/carritos";
 import { useEdicion } from "../../context/edicion";
 import Modal from "../Modal";
 
@@ -31,7 +31,7 @@ export default function CarritoCard({ carrito, portadasSugeridas, onSave, onMark
   return (
     <div className={`exh-card ${estadoCarritoAccentClass(carrito.estado)}`}>
       {editing && (
-        <Modal title={`Editar carrito ${String(carrito.numero).padStart(2, "0")}`} onClose={() => setEditing(false)}>
+        <Modal title={`Editar carrito ${carritoPlate(carrito)}`} onClose={() => setEditing(false)}>
           <div className="exh-form">
             <div className="exh-form-grid">
               <div className="exh-field">
@@ -69,7 +69,7 @@ export default function CarritoCard({ carrito, portadasSugeridas, onSave, onMark
         </Modal>
       )}
       <div className="exh-card-head">
-        <span className="exh-plate">{String(carrito.numero).padStart(2, "0")}</span>
+        <span className="exh-plate">{carritoPlate(carrito)}</span>
         <div className="exh-card-actions">
           <span className={`exh-badge ${estadoCarritoBadgeClass(carrito.estado)}`}>{carrito.estado}</span>
           {modoEdicion && <button type="button" className="exh-icon-btn" onClick={startEdit}><Pencil size={14} /></button>}
