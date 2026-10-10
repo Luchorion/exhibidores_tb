@@ -219,6 +219,12 @@ export default function App() {
       <NavTabs tab={tab} setTab={setTab} />
 
       <main className="exh-content">
+        {auth.authError && (
+          <div className="exh-alert" role="alert">
+            <span>{auth.authError}</span>
+            <button type="button" className="exh-icon-btn" onClick={auth.clearAuthError} aria-label="Cerrar aviso"><X size={14} /></button>
+          </div>
+        )}
         {loadError && (
           <div className="exh-alert" role="alert">
             <span>{loadError}</span>
