@@ -37,6 +37,14 @@ export function useAuth() {
     return () => data.subscription.unsubscribe();
   }, []);
 
+  // Ingreso con contraseña: no manda ningún mail. Sirve para usuarios creados
+  // desde el panel de Supabase con contraseña y "Auto Confirm User".
+  async function ingresarConPassword(email, password) {
+    if (!supabase) throw new Error("Supabase no está configurado.");
+    const { error } = await supabase.auth.signInWithPassword({ email, password });
+    if (error) throw error;
+  }
+
   async function enviarLink(email) {
     if (!supabase) throw new Error("Supabase no está configurado.");
     const { error } = await supabase.auth.signInWithOtp({
@@ -55,6 +63,7 @@ export function useAuth() {
     email: session?.user?.email ?? null,
     authError,
     clearAuthError: () => setAuthError(null),
+    ingresarConPassword,
     enviarLink,
     salir,
   };

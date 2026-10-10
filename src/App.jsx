@@ -276,7 +276,7 @@ export default function App() {
         )}
       </main>
 
-      {loginAbierto && <LoginDialog onEnviar={auth.enviarLink} onClose={() => setLoginAbierto(false)} />}
+      {loginAbierto && <LoginDialog onIngresar={auth.ingresarConPassword} onEnviarLink={auth.enviarLink} onClose={() => setLoginAbierto(false)} />}
 
       {infoAbierta?.tipo === "hermano" && (
         <HermanoInfoModal

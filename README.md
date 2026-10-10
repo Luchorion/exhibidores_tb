@@ -31,8 +31,11 @@ Ver el programa no requiere cuenta. Para crear, editar o borrar hay que
 ingresar con un link que llega por mail, y solo pueden ingresar las
 personas invitadas:
 
-1. En **Authentication → Users**, usá **Invite user** con el mail de cada
-   responsable.
+1. En **Authentication → Users → Add user → Create new user**, cargá el
+   mail y una contraseña de cada responsable y tildá **Auto Confirm User**.
+   Así ingresan con email y contraseña, sin que Supabase tenga que mandar
+   mails (el servicio de mail gratis de Supabase manda muy pocos por hora).
+   Como alternativa, la app también puede mandar un link de ingreso al mail.
 2. En **Authentication → Sign In / Providers**, desactivá **Allow new users
    to sign up** (así nadie más puede crearse una cuenta).
 3. En **Authentication → URL Configuration**, poné en **Site URL** la
