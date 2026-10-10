@@ -1,13 +1,16 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import { X } from "lucide-react";
 import { EdicionContext } from "./context/edicion";
 import { InfoPanelContext } from "./context/infoPanel";
 import { useAppData } from "./hooks/useAppData";
+import { useAuth } from "./hooks/useAuth";
 import { uid } from "./utils/id";
+import { hoyISO } from "./utils/dates";
 import { ordenarTurnos, computeConflictMap } from "./utils/turnos";
-import { carritoVencido } from "./utils/carritos";
-import { DIAS_CONTROL_FISICO, DIAS_REVISION_PUBLICACIONES } from "./data/constants";
+import { carritoVencido, registrarMantenimiento } from "./utils/carritos";
 import Header from "./components/Header";
 import NavTabs from "./components/NavTabs";
+import LoginDialog from "./components/LoginDialog";
 import TurnosTab from "./components/turnos/TurnosTab";
 import PuntosTab from "./components/puntos/PuntosTab";
 import CarritosTab from "./components/carritos/CarritosTab";
@@ -16,114 +19,161 @@ import HermanoInfoModal from "./components/info/HermanoInfoModal";
 import PuntoInfoModal from "./components/info/PuntoInfoModal";
 import CarritoInfoModal from "./components/info/CarritoInfoModal";
 
+function leerPreferenciaEdicion() {
+  try {
+    return localStorage.getItem("exh-modo-edicion") === "1";
+  } catch {
+    return false;
+  }
+}
+
+// Guarda o agrega un item por id. El id de uno nuevo se genera afuera para
+// que sea el mismo si useAppData tiene que reintentar el guardado.
+function upsert(list, id, draft) {
+  return list.some((x) => x.id === id)
+    ? list.map((x) => (x.id === id ? { ...x, ...draft } : x))
+    : [...list, { id, ...draft }];
+}
+
 export default function App() {
   const [tab, setTab] = useState("turnos");
-  const [modoEdicion, setModoEdicion] = useState(() => localStorage.getItem("exh-modo-edicion") === "1");
+  const [preferenciaEdicion, setPreferenciaEdicion] = useState(leerPreferenciaEdicion);
   const [infoAbierta, setInfoAbierta] = useState(null); // { tipo: "hermano"|"punto"|"carrito", id }
+  const [loginAbierto, setLoginAbierto] = useState(false);
+  const auth = useAuth();
+
+  const {
+    loading,
+    loadError,
+    reload,
+    refresh,
+    puntos,
+    carritos,
+    turnos,
+    hermanos: hermanosBase,
+    contactos,
+    saveError,
+    clearSaveError,
+    mutate,
+  } = useAppData();
+
+  // Al ingresar o salir cambia lo que se puede leer (los teléfonos).
+  const sessionUserId = auth.session?.user?.id;
+  useEffect(() => {
+    if (!loading) refresh();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [sessionUserId]);
+
+  // El teléfono se guarda aparte (ver "contactos" en useAppData) y se junta
+  // acá para mostrarlo.
+  const hermanos = useMemo(() => {
+    const telefonos = new Map(contactos.map((c) => [c.id, c.telefono]));
+    return hermanosBase.map((h) => ({ ...h, telefono: telefonos.get(h.id) || "" }));
+  }, [hermanosBase, contactos]);
+
+  // Editar requiere estar logueado (las policies de Supabase lo exigen igual)
+  // y que los datos hayan cargado bien.
+  const puedeEditar = Boolean(auth.session) && !loadError;
+  const modoEdicion = puedeEditar && preferenciaEdicion;
 
   function abrirInfo(tipo, id) {
     setInfoAbierta({ tipo, id });
   }
 
   function toggleEdicion() {
-    setModoEdicion((prev) => {
+    setPreferenciaEdicion((prev) => {
       const next = !prev;
-      localStorage.setItem("exh-modo-edicion", next ? "1" : "0");
+      try {
+        localStorage.setItem("exh-modo-edicion", next ? "1" : "0");
+      } catch {
+        // Sin localStorage (modo privado): la preferencia dura solo esta sesión.
+      }
       return next;
     });
   }
-  const {
-    loading,
-    puntos, setPuntos,
-    carritos, setCarritos,
-    turnos, setTurnos,
-    hermanos, setHermanos,
-    saveError,
-    persist,
-    KEYS,
-  } = useAppData();
 
   // ---------- Turnos ----------
   const turnosOrdenados = useMemo(() => ordenarTurnos(turnos), [turnos]);
   const conflictMap = useMemo(() => computeConflictMap(turnos), [turnos]);
   const totalTurnosConConflicto = Object.keys(conflictMap).length;
 
-  async function saveTurno(draft, editingId) {
-    const next = editingId
-      ? turnos.map((t) => (t.id === editingId ? { ...t, ...draft } : t))
-      : [...turnos, { id: uid(), ...draft }];
-    setTurnos(next);
-    await persist(KEYS.turnos, next);
+  function saveTurno(draft, editingId) {
+    const id = editingId || uid();
+    return mutate("turnos", (list) => upsert(list, id, draft));
   }
 
-  async function deleteTurno(id) {
-    const next = turnos.filter((t) => t.id !== id);
-    setTurnos(next);
-    await persist(KEYS.turnos, next);
+  function deleteTurno(id) {
+    return mutate("turnos", (list) => list.filter((t) => t.id !== id));
   }
 
   // ---------- Puntos ----------
-  async function savePunto(draft, editingId) {
-    const next = editingId
-      ? puntos.map((p) => (p.id === editingId ? { ...p, ...draft } : p))
-      : [...puntos, { id: uid(), ...draft }];
-    setPuntos(next);
-    await persist(KEYS.puntos, next);
+  function savePunto(draft, editingId) {
+    const id = editingId || uid();
+    return mutate("puntos", (list) => upsert(list, id, draft));
   }
 
   async function deletePunto(id) {
-    const next = puntos.filter((p) => p.id !== id);
-    setPuntos(next);
-    await persist(KEYS.puntos, next);
+    const ok = await mutate("puntos", (list) => list.filter((p) => p.id !== id));
+    if (!ok) return false;
+    // Los turnos de ese punto quedan como "Punto sin definir" para que se
+    // reasignen, y se lo saca de las preferencias de los hermanos.
+    if (turnos.some((t) => t.puntoId === id)) {
+      await mutate("turnos", (list) => list.map((t) => (t.puntoId === id ? { ...t, puntoId: "" } : t)));
+    }
+    if (hermanos.some((h) => (h.puntosPreferidos || []).includes(id))) {
+      await mutate("hermanos", (list) =>
+        list.map((h) => ((h.puntosPreferidos || []).includes(id) ? { ...h, puntosPreferidos: h.puntosPreferidos.filter((p) => p !== id) } : h))
+      );
+    }
+    return true;
   }
 
   // ---------- Carritos ----------
   async function saveCarrito(id, patch) {
-    const next = carritos.map((c) => (c.id === id ? { ...c, ...patch } : c));
-    setCarritos(next);
-    await persist(KEYS.carritos, next);
+    const ok = await mutate("carritos", (list) => list.map((c) => (c.id === id ? { ...c, ...patch } : c)));
+    if (!ok) return false;
 
-    // Un carrito de repuesto no está en la calle, así que no puede seguir
-    // asignado a ningún turno. Si se acaba de marcar así, se lo saca de
-    // donde estuviera.
-    if (patch.estado === "repuesto") {
-      const nextTurnos = turnos.map((t) =>
-        (t.carritoIds || []).includes(id) ? { ...t, carritoIds: t.carritoIds.filter((cid) => cid !== id) } : t
+    // Solo un carrito operativo está en la calle; si pasa a repuesto o
+    // pendiente se lo saca de los turnos donde estuviera asignado.
+    if (patch.estado && patch.estado !== "operativo" && turnos.some((t) => (t.carritoIds || []).includes(id))) {
+      await mutate("turnos", (list) =>
+        list.map((t) => ((t.carritoIds || []).includes(id) ? { ...t, carritoIds: t.carritoIds.filter((cid) => cid !== id) } : t))
       );
-      if (nextTurnos.some((t, i) => t !== turnos[i])) {
-        setTurnos(nextTurnos);
-        await persist(KEYS.turnos, nextTurnos);
-      }
     }
+    return true;
   }
 
-  async function marcarControlFisicoHoy(carrito) {
-    const hoy = new Date().toISOString().slice(0, 10);
-    const next = carritos.map((c) => (c.id === carrito.id ? { ...c, ultimoControlFisico: hoy } : c));
-    setCarritos(next);
-    await persist(KEYS.carritos, next);
-  }
-
-  async function marcarRevisionPublicacionesHoy(carrito) {
-    const hoy = new Date().toISOString().slice(0, 10);
-    const next = carritos.map((c) => (c.id === carrito.id ? { ...c, ultimaRevisionPublicaciones: hoy } : c));
-    setCarritos(next);
-    await persist(KEYS.carritos, next);
+  function registrarMantenimientoHoy(carrito, tipo) {
+    const hoy = hoyISO();
+    return mutate("carritos", (list) => list.map((c) => (c.id === carrito.id ? registrarMantenimiento(c, tipo, hoy) : c)));
   }
 
   // ---------- Hermanos ----------
   async function saveHermano(draft, editingId) {
-    const next = editingId
-      ? hermanos.map((h) => (h.id === editingId ? { ...h, ...draft } : h))
-      : [...hermanos, { id: uid(), ...draft }];
-    setHermanos(next);
-    await persist(KEYS.hermanos, next);
+    const id = editingId || uid();
+    const { telefono = "", ...datos } = draft;
+    const ok = await mutate("hermanos", (list) => upsert(list, id, datos));
+    if (!ok) return false;
+    const telefonoActual = contactos.find((c) => c.id === id)?.telefono || "";
+    if (telefono.trim() === telefonoActual) return true;
+    return mutate("contactos", (list) => {
+      const resto = list.filter((c) => c.id !== id);
+      return telefono.trim() ? [...resto, { id, telefono: telefono.trim() }] : resto;
+    });
   }
 
   async function deleteHermano(id) {
-    const next = hermanos.filter((h) => h.id !== id);
-    setHermanos(next);
-    await persist(KEYS.hermanos, next);
+    const ok = await mutate("hermanos", (list) => list.filter((h) => h.id !== id));
+    if (!ok) return false;
+    if (contactos.some((c) => c.id === id)) {
+      await mutate("contactos", (list) => list.filter((c) => c.id !== id));
+    }
+    if (turnos.some((t) => (t.hermanoIds || []).includes(id))) {
+      await mutate("turnos", (list) =>
+        list.map((t) => ((t.hermanoIds || []).includes(id) ? { ...t, hermanoIds: t.hermanoIds.filter((h) => h !== id) } : t))
+      );
+    }
+    return true;
   }
 
   const hermanosOrdenados = useMemo(() => [...hermanos].sort((a, b) => a.nombre.localeCompare(b.nombre)), [hermanos]);
@@ -134,12 +184,12 @@ export default function App() {
   const aprobadosSinTurno = hermanos.filter((h) => h.estado === "aprobado" && !idsConTurno.has(h.id)).length;
   const operativos = carritos.filter((c) => c.estado === "operativo").length;
   const turnosConfirmados = turnos.filter((t) => (t.estado || "confirmado") === "confirmado").length;
-  const carritosVencidos = carritos.filter((c) => carritoVencido(c, DIAS_CONTROL_FISICO, DIAS_REVISION_PUBLICACIONES)).length;
+  const carritosVencidos = carritos.filter((c) => carritoVencido(c)).length;
 
   if (loading) {
     return (
       <div className="exh-root">
-        <div className="exh-loading">CARGANDO PANEL…</div>
+        <div className="exh-loading" role="status">CARGANDO PANEL…</div>
       </div>
     );
   }
@@ -158,16 +208,27 @@ export default function App() {
         turnosProgramados={turnos.length}
         carritosVencidos={carritosVencidos}
         totalTurnosConConflicto={totalTurnosConConflicto}
+        email={auth.email}
+        puedeEditar={puedeEditar}
         modoEdicion={modoEdicion}
         onToggleEdicion={toggleEdicion}
+        onLogin={() => setLoginAbierto(true)}
+        onLogout={auth.salir}
       />
 
       <NavTabs tab={tab} setTab={setTab} />
 
       <main className="exh-content">
+        {loadError && (
+          <div className="exh-alert" role="alert">
+            <span>{loadError}</span>
+            <button type="button" className="exh-btn exh-btn-ghost" onClick={reload}>Reintentar</button>
+          </div>
+        )}
         {saveError && (
-          <div className="exh-form" style={{ borderLeft: "4px solid var(--rust)", marginBottom: 16, fontSize: 13 }}>
-            {saveError}
+          <div className="exh-alert" role="alert">
+            <span>{saveError}</span>
+            <button type="button" className="exh-icon-btn" onClick={clearSaveError} aria-label="Cerrar aviso"><X size={14} /></button>
           </div>
         )}
 
@@ -192,9 +253,9 @@ export default function App() {
         {tab === "carritos" && (
           <CarritosTab
             carritos={carritos}
+            turnos={turnos}
             onSaveCarrito={saveCarrito}
-            onMarkControl={marcarControlFisicoHoy}
-            onMarkRevision={marcarRevisionPublicacionesHoy}
+            onRegistrarMantenimiento={registrarMantenimientoHoy}
           />
         )}
 
@@ -208,6 +269,8 @@ export default function App() {
           />
         )}
       </main>
+
+      {loginAbierto && <LoginDialog onEnviar={auth.enviarLink} onClose={() => setLoginAbierto(false)} />}
 
       {infoAbierta?.tipo === "hermano" && (
         <HermanoInfoModal

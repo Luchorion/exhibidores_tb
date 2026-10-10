@@ -1,6 +1,7 @@
 import { User } from "lucide-react";
 import Modal from "../Modal";
 import TurnoMiniRow from "./TurnoMiniRow";
+import { ContactoHermano } from "../hermanos/HermanoCard";
 import { useInfoPanel } from "../../context/infoPanel";
 import { formatFechaCorta } from "../../utils/dates";
 import { estadoHermanoBadgeClass, estadoHermanoLabel } from "../../utils/hermanos";
@@ -21,7 +22,10 @@ export default function HermanoInfoModal({ hermanoId, hermanos, puntos, carritos
       <div>
         <span className={`exh-badge ${estadoHermanoBadgeClass(hermano.estado)}`}>{estadoHermanoLabel(hermano.estado)}</span>
 
-        <div className="exh-meta-row" style={{ marginTop: 10 }}>
+        <div style={{ marginTop: 10 }}>
+          <ContactoHermano telefono={hermano.telefono} />
+        </div>
+        <div className="exh-meta-row">
           <span>Fecha aprobación</span>
           <strong>{hermano.fechaAprobacion ? formatFechaCorta(hermano.fechaAprobacion) : "Sin registro"}</strong>
         </div>

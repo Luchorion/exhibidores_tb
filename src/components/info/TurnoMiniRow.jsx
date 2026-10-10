@@ -1,6 +1,7 @@
 import { Clock } from "lucide-react";
 import { useInfoPanel } from "../../context/infoPanel";
 import { estadoHermanoLabel } from "../../utils/hermanos";
+import { describeFrecuencia } from "../../utils/turnos";
 
 // Resumen compacto de un turno, reutilizado dentro de las tres fichas de
 // info (hermano/punto/carrito). ocultarPunto/ocultarHermanos/ocultarCarritos
@@ -19,6 +20,7 @@ export default function TurnoMiniRow({ turno, puntos, hermanos, carritos, oculta
         <span>{turno.dia}</span>
         <span>{turno.horaInicio}{turno.horaFin ? `–${turno.horaFin}` : ""}</span>
         {esPropuesto && <span className="exh-badge exh-badge-amber">Propuesto</span>}
+        {(turno.frecuencia || "Semanal") !== "Semanal" && <span className="exh-badge exh-badge-muted">{describeFrecuencia(turno)}</span>}
       </div>
 
       {!ocultarPunto && (

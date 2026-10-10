@@ -3,6 +3,7 @@ import { DIAS_SEMANA } from "../../data/constants";
 import { useEdicion } from "../../context/edicion";
 import { useInfoPanel } from "../../context/infoPanel";
 import { estadoHermanoLabel } from "../../utils/hermanos";
+import { describeFrecuencia } from "../../utils/turnos";
 
 export default function TurnoListView({ turnosPorDia, puntos, carritos, hermanos, conflictMap, describeConflicto, onEdit, onDelete }) {
   const modoEdicion = useEdicion();
@@ -45,7 +46,7 @@ export default function TurnoListView({ turnosPorDia, puntos, carritos, hermanos
               {t.notas && <div className="exh-row-sub">{t.notas}</div>}
               <div className="exh-row-tags">
                 {esPropuesto && <span className="exh-badge exh-badge-amber">Propuesto</span>}
-                <span className="exh-badge exh-badge-amber">{t.frecuencia || "Semanal"}</span>
+                <span className="exh-badge exh-badge-amber">{describeFrecuencia(t)}</span>
                 {carritosDelTurno.map((c) => (
                   <button
                     key={c.id}
@@ -58,16 +59,16 @@ export default function TurnoListView({ turnosPorDia, puntos, carritos, hermanos
                 ))}
               </div>
               {conflictosTurno.length > 0 && (
-                <div className="exh-warn-box">
+                <div className="exh-warn-box" role="note">
                   <AlertTriangle size={15} style={{ flexShrink: 0, marginTop: 1 }} />
                   <div>{conflictosTurno.map((c, i) => <div key={i}>{describeConflicto(c)}</div>)}</div>
                 </div>
               )}
             </div>
             {modoEdicion && (
-              <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
-                <button type="button" className="exh-icon-btn" onClick={() => onEdit(t)}><Pencil size={15} /></button>
-                <button type="button" className="exh-icon-btn" onClick={() => onDelete(t.id)}><Trash2 size={15} /></button>
+              <div className="exh-no-print" style={{ display: "flex", flexDirection: "column", gap: 4 }}>
+                <button type="button" className="exh-icon-btn" aria-label={`Editar turno del ${t.dia} ${t.horaInicio}`} title="Editar" onClick={() => onEdit(t)}><Pencil size={15} /></button>
+                <button type="button" className="exh-icon-btn" aria-label={`Borrar turno del ${t.dia} ${t.horaInicio}`} title="Borrar" onClick={() => onDelete(t)}><Trash2 size={15} /></button>
               </div>
             )}
           </div>

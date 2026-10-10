@@ -22,3 +22,14 @@ export function normalizeHermano(h) {
   const { diasPreferidos: _diasPreferidos, horarioPreferido: _horarioPreferido, ...rest } = h;
   return { ...rest, disponibilidad };
 }
+
+// Link de WhatsApp a partir de un teléfono cargado a mano. Para números
+// argentinos sin código de país se asume +54 9 (celular).
+export function whatsappLink(telefono) {
+  let digits = (telefono || "").replace(/\D/g, "");
+  if (!digits) return null;
+  if (digits.startsWith("00")) digits = digits.slice(2);
+  else if (digits.startsWith("0")) digits = "549" + digits.slice(1);
+  else if (!digits.startsWith("54")) digits = "549" + digits;
+  return `https://wa.me/${digits}`;
+}

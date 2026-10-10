@@ -7,12 +7,13 @@ const TABS = [
 
 export default function NavTabs({ tab, setTab }) {
   return (
-    <nav className="exh-nav">
+    <nav className="exh-nav" aria-label="Secciones">
       {TABS.map((t) => (
         <button
           key={t.key}
           type="button"
           className={`exh-tab ${tab === t.key ? "active" : ""}`}
+          aria-current={tab === t.key ? "page" : undefined}
           onClick={() => setTab(t.key)}
         >
           {t.label}

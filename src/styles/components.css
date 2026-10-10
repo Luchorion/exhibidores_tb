@@ -148,11 +148,12 @@
   text-transform: uppercase;
   font-size: 15px;
   letter-spacing: 0.05em;
+  font-weight: 400;
   color: var(--muted);
   margin: 0;
 }
 
-.exh-section-actions { display: flex; gap: 8px; align-items: center; }
+.exh-section-actions { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
 
 .exh-btn {
   display: inline-flex;
@@ -576,6 +577,113 @@
 }
 .exh-disp-toggle.active { background: var(--amber); border-color: var(--amber-dark); }
 
+.exh-header-actions { display: flex; align-items: center; gap: 14px; }
+.exh-header-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: rgba(238,241,239,0.6);
+  padding: 4px 0;
+}
+.exh-header-link:hover { color: var(--paper); }
+
+.exh-btn:disabled { opacity: 0.6; cursor: default; }
+.exh-btn-danger { background: var(--rust); color: white; }
+.exh-btn-danger:hover { background: #A8452F; }
+
+/* Foco visible para quien navega con teclado (no aparece con el mouse). */
+.exh-btn:focus-visible, .exh-icon-btn:focus-visible, .exh-tab:focus-visible, .exh-chip:focus-visible,
+.exh-toggle-btn:focus-visible, .exh-link:focus-visible, .exh-persona-tag:focus-visible, .exh-badge-link:focus-visible,
+.exh-disp-toggle:focus-visible, .exh-picker-item:focus-visible, .exh-switch:focus-visible, .exh-header-link:focus-visible,
+.exh-card-clickable:focus-visible, .exh-grid-card:focus-visible, .exh-chip-x:focus-visible, .exh-contacto-link:focus-visible {
+  outline: 2px solid var(--slate);
+  outline-offset: 2px;
+}
+
+.exh-alert {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  background: var(--paper-raised);
+  border: 1px solid var(--line);
+  border-left: 4px solid var(--rust);
+  border-radius: 4px;
+  padding: 10px 12px;
+  margin-bottom: 16px;
+  font-size: 13px;
+}
+
+.exh-note-box {
+  display: flex;
+  gap: 8px;
+  align-items: flex-start;
+  background: rgba(226,167,59,0.12);
+  border: 1px solid rgba(226,167,59,0.45);
+  color: var(--amber-dark);
+  border-radius: 4px;
+  padding: 10px 12px;
+  font-size: 12.5px;
+  margin-top: 6px;
+}
+
+.exh-toast {
+  background: var(--ink);
+  color: var(--paper);
+  border-radius: 4px;
+  padding: 8px 12px;
+  font-size: 13px;
+  margin-bottom: 12px;
+  display: inline-block;
+}
+
+.exh-confirm-msg { font-size: 14px; line-height: 1.5; margin-bottom: 14px; }
+
+.exh-fieldset { border: none; min-width: 0; }
+.exh-fieldset legend { margin-bottom: 4px; padding: 0; }
+
+.exh-picker-item {
+  width: 100%;
+  background: none;
+  border: none;
+  font-family: inherit;
+  color: inherit;
+  text-align: left;
+}
+
+.exh-contacto { display: inline-flex; flex-wrap: wrap; gap: 10px; justify-content: flex-end; }
+.exh-contacto-link { display: inline-flex; align-items: center; gap: 4px; color: var(--slate-dark); text-decoration: none; }
+.exh-contacto-link:hover { text-decoration: underline; }
+
+.exh-historial { list-style: none; margin-top: 6px; font-size: 12px; }
+.exh-historial li {
+  display: flex;
+  gap: 12px;
+  padding: 4px 0;
+  border-bottom: 1px solid var(--line);
+}
+.exh-historial li span:first-child { font-family: 'IBM Plex Mono', monospace; min-width: 80px; }
+
+/* ---------- Impresión ----------
+   Al imprimir el programa (botón "Imprimir" en Turnos) se ocultan el
+   encabezado, la navegación y los controles; queda solo el contenido. */
+@media print {
+  .exh-header, .exh-nav, .exh-alert, .exh-toast, .exh-no-print, .exh-toggle-group, .exh-modal-overlay { display: none !important; }
+  .exh-root { background: white; padding: 0; min-height: 0; }
+  .exh-content { padding: 0; max-width: none; }
+  .exh-row, .exh-grid-card, .exh-mini-turno { break-inside: avoid; background: white; }
+  .exh-grid { min-width: 0; grid-template-columns: repeat(7, 1fr); }
+  .exh-grid-wrap { overflow: visible; }
+  .exh-section-title { color: black; font-size: 18px; }
+}
+
 /* ---------- Ajustes responsive (celular / tablet) ----------
    Este bloque va al final a propósito: varias reglas de arriba
    (.exh-search .exh-input, etc.) tienen la misma especificidad que las
@@ -589,6 +697,8 @@
   .exh-input, .exh-select, .exh-textarea, .exh-search .exh-input { font-size: 16px; }
   .exh-row { flex-wrap: wrap; gap: 6px 14px; }
   .exh-time { min-width: 0; width: 100%; padding-top: 0; }
+  .exh-toggle-group { width: 100%; }
+  .exh-toggle-btn { flex: 1; justify-content: center; white-space: nowrap; }
 
   /* El buscador y los filtros comparten fila con los <select> del filtro
      de arriba; sin un ancho de línea propio, el buscador (flex:1 con

@@ -1,7 +1,7 @@
 import { PORTADAS_SUGERIDAS } from "../../data/constants";
 import CarritoCard from "./CarritoCard";
 
-export default function CarritosTab({ carritos, onSaveCarrito, onMarkControl, onMarkRevision }) {
+export default function CarritosTab({ carritos, turnos, onSaveCarrito, onRegistrarMantenimiento }) {
   // Sugerencias del desplegable: las fijas más cualquier portada que ya se
   // haya escrito en algún carrito (así los ítems nuevos quedan disponibles
   // para los demás).
@@ -10,17 +10,17 @@ export default function CarritosTab({ carritos, onSaveCarrito, onMarkControl, on
   return (
     <section>
       <div className="exh-section-head">
-        <p className="exh-section-title">Carritos exhibidores</p>
+        <h2 className="exh-section-title">Carritos exhibidores</h2>
       </div>
       <div className="exh-cards">
         {carritos.map((c) => (
           <CarritoCard
             key={c.id}
             carrito={c}
+            turnosAsignados={turnos.filter((t) => (t.carritoIds || []).includes(c.id)).length}
             portadasSugeridas={portadasSugeridas}
             onSave={onSaveCarrito}
-            onMarkControl={onMarkControl}
-            onMarkRevision={onMarkRevision}
+            onRegistrarMantenimiento={onRegistrarMantenimiento}
           />
         ))}
       </div>

@@ -1,3 +1,4 @@
+import { DIAS_CONTROL_FISICO, DIAS_REVISION_PUBLICACIONES } from "../data/constants";
 import { diasDesde } from "./dates";
 
 // Adapta carritos guardados con el esquema viejo: "ultimoMantenimiento" se
@@ -9,6 +10,7 @@ export function normalizeCarrito(c) {
     portada: c.portada ?? "",
     ultimoControlFisico: c.ultimoControlFisico ?? c.ultimoMantenimiento ?? "",
     ultimaRevisionPublicaciones: c.ultimaRevisionPublicaciones ?? "",
+    historial: Array.isArray(c.historial) ? c.historial : [],
   };
 }
 
@@ -37,14 +39,32 @@ export function carritoPlate(carrito) {
 
 // Repuesto y pendiente no están en servicio, así que no tienen control
 // físico ni revisión de publicaciones que vencer.
-export function carritoVencido(c, diasControlLimite, diasPubLimite) {
-  if (c.estado !== "operativo") return false;
-  const diasControl = diasDesde(c.ultimoControlFisico);
-  const diasPub = diasDesde(c.ultimaRevisionPublicaciones);
-  return (
-    diasControl === null ||
-    diasControl > diasControlLimite ||
-    diasPub === null ||
-    diasPub > diasPubLimite
-  );
+export function estadoMantenimiento(c, hoy = new Date()) {
+  if (c.estado !== "operativo") return { controlVencido: false, pubVencida: false };
+  const diasControl = diasDesde(c.ultimoControlFisico, hoy);
+  const diasPub = diasDesde(c.ultimaRevisionPublicaciones, hoy);
+  return {
+    controlVencido: diasControl === null || diasControl > DIAS_CONTROL_FISICO,
+    pubVencida: diasPub === null || diasPub > DIAS_REVISION_PUBLICACIONES,
+  };
+}
+
+export function carritoVencido(c, hoy) {
+  const { controlVencido, pubVencida } = estadoMantenimiento(c, hoy);
+  return controlVencido || pubVencida;
+}
+
+export const TIPOS_MANTENIMIENTO = {
+  control: { campo: "ultimoControlFisico", label: "Control físico" },
+  revision: { campo: "ultimaRevisionPublicaciones", label: "Revisión de publicaciones" },
+};
+
+// Registra un mantenimiento: actualiza la "última fecha" y lo agrega al
+// historial (más reciente primero).
+export function registrarMantenimiento(c, tipo, fecha) {
+  return {
+    ...c,
+    [TIPOS_MANTENIMIENTO[tipo].campo]: fecha,
+    historial: [{ tipo, fecha }, ...(c.historial || [])],
+  };
 }

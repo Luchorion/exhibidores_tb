@@ -3,6 +3,8 @@ import { DIAS_SEMANA } from "../../data/constants";
 import { useEdicion } from "../../context/edicion";
 import { useInfoPanel } from "../../context/infoPanel";
 import { estadoHermanoLabel } from "../../utils/hermanos";
+import { describeFrecuencia } from "../../utils/turnos";
+import { clickableProps } from "../../utils/a11y";
 
 export default function TurnoGridView({ turnosPorDia, puntos, carritos, hermanos, conflictMap, onEdit }) {
   const modoEdicion = useEdicion();
@@ -33,13 +35,13 @@ export default function TurnoGridView({ turnosPorDia, puntos, carritos, hermanos
                     <div
                       className={`exh-grid-card ${esPropuesto ? "propuesto" : ""} ${conflictosTurno.length ? "conflicto" : ""}`}
                       key={t.id}
-                      onClick={modoEdicion ? () => onEdit(t) : undefined}
                       style={modoEdicion ? { cursor: "pointer" } : undefined}
                       title={modoEdicion ? "Tocar para editar" : undefined}
+                      {...(modoEdicion ? clickableProps(() => onEdit(t)) : {})}
                     >
                       <div className="exh-grid-time">
                         {t.horaInicio}{t.horaFin ? `–${t.horaFin}` : ""}{" "}
-                        {conflictosTurno.length > 0 && <AlertTriangle size={11} style={{ verticalAlign: -1, color: "var(--rust)" }} />}
+                        {conflictosTurno.length > 0 && <AlertTriangle size={11} style={{ verticalAlign: -1, color: "var(--rust)" }} aria-label="Conflicto" />}
                       </div>
                       <div className="exh-grid-point">
                         {punto ? (
@@ -70,7 +72,7 @@ export default function TurnoGridView({ turnosPorDia, puntos, carritos, hermanos
                             {i > 0 && ", "}
                             <button type="button" className="exh-link" style={{ display: "inline", width: "auto" }} onClick={(e) => abrirInfoDesdeCard(e, "carrito", c.id)}>C{c.numero}</button>
                           </span>
-                        )) : "Sin carrito"} · {t.frecuencia}
+                        )) : "Sin carrito"} · {describeFrecuencia(t)}
                       </div>
                     </div>
                   );

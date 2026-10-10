@@ -1,9 +1,11 @@
-import { useEffect, useRef, useState } from "react";
-import { Check, AlertTriangle, Search, X } from "lucide-react";
+import { useEffect, useId, useRef, useState } from "react";
+import { Check, AlertTriangle, Search, X, Info } from "lucide-react";
 import { DIAS_SEMANA, ESTADOS_TURNO, FRECUENCIAS } from "../../data/constants";
 import { toggleInArray } from "../../utils/array";
 import { estadoHermanoLabel } from "../../utils/hermanos";
 import { normalizarTexto } from "../../utils/text";
+import { OPCIONES_SEMANAS } from "../../utils/turnos";
+import FormErrors from "../FormErrors";
 
 export default function TurnoForm({
   draft,
@@ -13,10 +15,14 @@ export default function TurnoForm({
   hermanosOrdenados,
   editingTurnoId,
   conflictos,
+  advertencias,
+  errores,
+  guardando,
   describeConflicto,
   onSave,
   onCancel,
 }) {
+  const ids = useId();
   const [hermanoQuery, setHermanoQuery] = useState("");
   const [pickerOpen, setPickerOpen] = useState(false);
   const pickerRef = useRef(null);
@@ -35,63 +41,100 @@ export default function TurnoForm({
   const hermanosSeleccionados = draft.hermanoIds
     .map((id) => hermanosOrdenados.find((h) => h.id === id))
     .filter(Boolean);
+  // Se ofrecen los operativos, más cualquiera que ya estuviera asignado
+  // aunque haya dejado de estarlo, para poder quitarlo.
+  const carritosElegibles = carritos.filter((c) => c.estado === "operativo" || draft.carritoIds.includes(c.id));
+  const opcionesSemanas = OPCIONES_SEMANAS[draft.frecuencia] || [];
+
+  function toggleHermano(id) {
+    setDraft({ ...draft, hermanoIds: toggleInArray(draft.hermanoIds, id) });
+  }
 
   return (
     <div className="exh-form">
       <div className="exh-form-grid">
         <div className="exh-field">
-          <label className="exh-label">Día</label>
-          <select className="exh-select" value={draft.dia} onChange={(e) => setDraft({ ...draft, dia: e.target.value })}>
+          <label className="exh-label" htmlFor={`${ids}-dia`}>Día</label>
+          <select id={`${ids}-dia`} className="exh-select" value={draft.dia} onChange={(e) => setDraft({ ...draft, dia: e.target.value })}>
             <option value="">Seleccionar…</option>
             {DIAS_SEMANA.map((d) => <option key={d} value={d}>{d}</option>)}
           </select>
         </div>
         <div className="exh-field">
-          <label className="exh-label">Frecuencia</label>
-          <select className="exh-select" value={draft.frecuencia} onChange={(e) => setDraft({ ...draft, frecuencia: e.target.value })}>
+          <label className="exh-label" htmlFor={`${ids}-frecuencia`}>Frecuencia</label>
+          <select
+            id={`${ids}-frecuencia`}
+            className="exh-select"
+            value={draft.frecuencia}
+            onChange={(e) => setDraft({ ...draft, frecuencia: e.target.value, semanas: [] })}
+          >
             {FRECUENCIAS.map((f) => <option key={f} value={f}>{f}</option>)}
           </select>
         </div>
+        {opcionesSemanas.length > 0 && (
+          <div className="exh-field full">
+            <label className="exh-label" htmlFor={`${ids}-semanas`}>¿Qué semanas del mes?</label>
+            <select
+              id={`${ids}-semanas`}
+              className="exh-select"
+              value={draft.semanas.join(",")}
+              onChange={(e) => setDraft({ ...draft, semanas: e.target.value ? e.target.value.split(",").map(Number) : [] })}
+            >
+              <option value="">Sin definir</option>
+              {opcionesSemanas.map((o) => (
+                <option key={o.value.join(",")} value={o.value.join(",")}>
+                  {o.label}{draft.dia ? ` (${o.value.map((n) => `${n}º ${draft.dia.toLowerCase()}`).join(" y ")} del mes)` : ""}
+                </option>
+              ))}
+            </select>
+          </div>
+        )}
         <div className="exh-field">
-          <label className="exh-label">Estado</label>
-          <select className="exh-select" value={draft.estado} onChange={(e) => setDraft({ ...draft, estado: e.target.value })}>
+          <label className="exh-label" htmlFor={`${ids}-estado`}>Estado</label>
+          <select id={`${ids}-estado`} className="exh-select" value={draft.estado} onChange={(e) => setDraft({ ...draft, estado: e.target.value })}>
             {ESTADOS_TURNO.map((e) => <option key={e.value} value={e.value}>{e.label}</option>)}
           </select>
         </div>
         <div className="exh-field" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8 }}>
           <div>
-            <label className="exh-label">Desde</label>
-            <input type="time" className="exh-input" style={{ width: "100%" }} value={draft.horaInicio} onChange={(e) => setDraft({ ...draft, horaInicio: e.target.value })} />
+            <label className="exh-label" htmlFor={`${ids}-desde`}>Desde</label>
+            <input id={`${ids}-desde`} type="time" className="exh-input" style={{ width: "100%" }} value={draft.horaInicio} onChange={(e) => setDraft({ ...draft, horaInicio: e.target.value })} />
           </div>
           <div>
-            <label className="exh-label">Hasta</label>
-            <input type="time" className="exh-input" style={{ width: "100%" }} value={draft.horaFin} onChange={(e) => setDraft({ ...draft, horaFin: e.target.value })} />
+            <label className="exh-label" htmlFor={`${ids}-hasta`}>Hasta</label>
+            <input id={`${ids}-hasta`} type="time" className="exh-input" style={{ width: "100%" }} value={draft.horaFin} onChange={(e) => setDraft({ ...draft, horaFin: e.target.value })} />
           </div>
         </div>
         <div className="exh-field full">
-          <label className="exh-label">Punto</label>
-          <select className="exh-select" value={draft.puntoId} onChange={(e) => setDraft({ ...draft, puntoId: e.target.value })}>
+          <label className="exh-label" htmlFor={`${ids}-punto`}>Punto</label>
+          <select id={`${ids}-punto`} className="exh-select" value={draft.puntoId} onChange={(e) => setDraft({ ...draft, puntoId: e.target.value })}>
             <option value="">Seleccionar…</option>
             {puntos.map((p) => <option key={p.id} value={p.id}>{p.nombre}</option>)}
           </select>
         </div>
-        <div className="exh-field full">
-          <label className="exh-label">Carritos ({draft.carritoIds.length} seleccionados)</label>
+        <fieldset className="exh-field full exh-fieldset">
+          <legend className="exh-label">Carritos ({draft.carritoIds.length} seleccionados)</legend>
           <div className="exh-chip-group">
-            {carritos.filter((c) => c.estado === "operativo").map((c) => (
-              <button
-                type="button"
-                key={c.id}
-                className={`exh-chip ${draft.carritoIds.includes(c.id) ? "selected" : ""}`}
-                onClick={() => setDraft({ ...draft, carritoIds: toggleInArray(draft.carritoIds, c.id) })}
-              >
-                Carrito {c.numero}
-              </button>
-            ))}
+            {carritosElegibles.map((c) => {
+              const selected = draft.carritoIds.includes(c.id);
+              const noOperativo = c.estado !== "operativo";
+              return (
+                <button
+                  type="button"
+                  key={c.id}
+                  className={`exh-chip ${selected ? "selected" : ""}`}
+                  aria-pressed={selected}
+                  title={noOperativo ? `Este carrito está ${c.estado}: quitalo del turno` : undefined}
+                  onClick={() => setDraft({ ...draft, carritoIds: toggleInArray(draft.carritoIds, c.id) })}
+                >
+                  Carrito {c.numero ?? "—"}{noOperativo ? ` (${c.estado})` : ""}
+                </button>
+              );
+            })}
           </div>
-        </div>
+        </fieldset>
         <div className="exh-field full">
-          <label className="exh-label">Hermanos que participan ({draft.hermanoIds.length} seleccionados)</label>
+          <label className="exh-label" htmlFor={`${ids}-buscar`}>Hermanos que participan ({draft.hermanoIds.length} seleccionados)</label>
           {hermanosOrdenados.length === 0 ? (
             <p style={{ fontSize: 12, color: "var(--muted)" }}>Todavía no cargaste hermanos. Agregalos en la pestaña "Hermanos".</p>
           ) : (
@@ -100,31 +143,51 @@ export default function TurnoForm({
                 <div className="exh-search" style={{ display: "flex" }}>
                   <Search size={13} />
                   <input
+                    id={`${ids}-buscar`}
                     className="exh-input"
                     style={{ width: "100%" }}
                     placeholder="Buscar y agregar hermanos…"
+                    role="combobox"
+                    aria-expanded={pickerOpen}
+                    aria-controls={`${ids}-lista`}
+                    autoComplete="off"
                     value={hermanoQuery}
                     onChange={(e) => { setHermanoQuery(e.target.value); setPickerOpen(true); }}
                     onFocus={() => setPickerOpen(true)}
+                    onKeyDown={(e) => {
+                      if (e.key === "Escape" && pickerOpen) {
+                        e.stopPropagation();
+                        setPickerOpen(false);
+                      }
+                      // Enter agrega el primer resultado, para cargar rápido.
+                      if (e.key === "Enter" && hermanosFiltrados.length > 0) {
+                        e.preventDefault();
+                        toggleHermano(hermanosFiltrados[0].id);
+                        setHermanoQuery("");
+                      }
+                    }}
                   />
                 </div>
                 {pickerOpen && (
-                  <div className="exh-picker-list">
+                  <div className="exh-picker-list" id={`${ids}-lista`} role="listbox" aria-multiselectable="true">
                     {hermanosFiltrados.length === 0 ? (
                       <div className="exh-picker-empty">Sin resultados para "{hermanoQuery}"</div>
                     ) : (
                       hermanosFiltrados.map((h) => {
                         const seleccionado = draft.hermanoIds.includes(h.id);
                         return (
-                          <div
+                          <button
+                            type="button"
                             key={h.id}
+                            role="option"
+                            aria-selected={seleccionado}
                             className={`exh-picker-item ${seleccionado ? "selected" : ""}`}
                             title={estadoHermanoLabel(h.estado)}
-                            onClick={() => setDraft({ ...draft, hermanoIds: toggleInArray(draft.hermanoIds, h.id) })}
+                            onClick={() => toggleHermano(h.id)}
                           >
                             <span className={`exh-estado-dot ${h.estado}`} />{h.nombre}
                             {seleccionado && <Check size={13} style={{ marginLeft: "auto", color: "var(--green)" }} />}
-                          </div>
+                          </button>
                         );
                       })
                     )}
@@ -140,7 +203,7 @@ export default function TurnoForm({
                         type="button"
                         className="exh-chip-x"
                         aria-label={`Quitar a ${h.nombre}`}
-                        onClick={() => setDraft({ ...draft, hermanoIds: draft.hermanoIds.filter((id) => id !== h.id) })}
+                        onClick={() => toggleHermano(h.id)}
                       >
                         <X size={12} />
                       </button>
@@ -151,21 +214,30 @@ export default function TurnoForm({
             </>
           )}
           {conflictos.length > 0 && (
-            <div className="exh-warn-box">
+            <div className="exh-warn-box" role="alert">
               <AlertTriangle size={15} style={{ flexShrink: 0, marginTop: 1 }} />
               <div>
                 {conflictos.map((c, i) => <div key={i}>{describeConflicto(c)}</div>)}
               </div>
             </div>
           )}
+          {advertencias.length > 0 && (
+            <div className="exh-note-box">
+              <Info size={15} style={{ flexShrink: 0, marginTop: 1 }} />
+              <div>
+                {advertencias.map((a) => <div key={a}>{a}</div>)}
+              </div>
+            </div>
+          )}
         </div>
         <div className="exh-field full">
-          <label className="exh-label">Notas</label>
-          <textarea className="exh-textarea" value={draft.notas} onChange={(e) => setDraft({ ...draft, notas: e.target.value })} placeholder="Opcional" />
+          <label className="exh-label" htmlFor={`${ids}-notas`}>Notas</label>
+          <textarea id={`${ids}-notas`} className="exh-textarea" value={draft.notas} onChange={(e) => setDraft({ ...draft, notas: e.target.value })} placeholder="Opcional" />
         </div>
       </div>
+      <FormErrors errores={errores} />
       <div className="exh-form-actions">
-        <button type="button" className="exh-btn exh-btn-amber" onClick={onSave}><Check size={15} /> {editingTurnoId ? "Guardar cambios" : "Guardar turno"}</button>
+        <button type="button" className="exh-btn exh-btn-amber" onClick={onSave} disabled={guardando}><Check size={15} /> {editingTurnoId ? "Guardar cambios" : "Guardar turno"}</button>
         <button type="button" className="exh-btn exh-btn-ghost" onClick={onCancel}>Cancelar</button>
       </div>
     </div>

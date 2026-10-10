@@ -2,21 +2,20 @@ import { AlertTriangle, ShoppingCart } from "lucide-react";
 import Modal from "../Modal";
 import TurnoMiniRow from "./TurnoMiniRow";
 import { ordenarTurnos } from "../../utils/turnos";
-import { diasDesde, formatFechaCorta } from "../../utils/dates";
-import { carritoPlate, estadoCarritoBadgeClass } from "../../utils/carritos";
+import { formatFechaCorta } from "../../utils/dates";
+import { carritoPlate, estadoCarritoBadgeClass, estadoMantenimiento, TIPOS_MANTENIMIENTO } from "../../utils/carritos";
 import { DIAS_CONTROL_FISICO, DIAS_REVISION_PUBLICACIONES } from "../../data/constants";
+
+const HISTORIAL_VISIBLE = 12;
 
 export default function CarritoInfoModal({ carritoId, carritos, hermanos, puntos, turnos, onClose }) {
   const carrito = carritos.find((c) => c.id === carritoId);
   if (!carrito) return null;
 
   const esOperativo = carrito.estado === "operativo";
-  const diasControl = diasDesde(carrito.ultimoControlFisico);
-  const diasPub = diasDesde(carrito.ultimaRevisionPublicaciones);
-  const controlVencido = esOperativo && (diasControl === null || diasControl > DIAS_CONTROL_FISICO);
-  const pubVencida = esOperativo && (diasPub === null || diasPub > DIAS_REVISION_PUBLICACIONES);
-
+  const { controlVencido, pubVencida } = estadoMantenimiento(carrito);
   const turnosDelCarrito = ordenarTurnos(turnos.filter((t) => (t.carritoIds || []).includes(carrito.id)));
+  const historial = carrito.historial || [];
 
   return (
     <Modal title={<><ShoppingCart size={15} style={{ marginRight: 6, verticalAlign: -2 }} />Carrito {carritoPlate(carrito)}</>} onClose={onClose}>
@@ -65,6 +64,23 @@ export default function CarritoInfoModal({ carritoId, carritos, hermanos, puntos
             </div>
           )}
         </div>
+
+        {historial.length > 0 && (
+          <div className="exh-info-section">
+            <span className="exh-label">Historial de mantenimiento</span>
+            <ul className="exh-historial">
+              {historial.slice(0, HISTORIAL_VISIBLE).map((h, i) => (
+                <li key={`${h.fecha}-${h.tipo}-${i}`}>
+                  <span>{formatFechaCorta(h.fecha)}</span>
+                  <span>{TIPOS_MANTENIMIENTO[h.tipo]?.label || h.tipo}</span>
+                </li>
+              ))}
+            </ul>
+            {historial.length > HISTORIAL_VISIBLE && (
+              <p style={{ fontSize: 11, color: "var(--muted)", marginTop: 4 }}>y {historial.length - HISTORIAL_VISIBLE} registros anteriores.</p>
+            )}
+          </div>
+        )}
       </div>
     </Modal>
   );

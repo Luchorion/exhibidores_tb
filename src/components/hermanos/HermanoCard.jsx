@@ -1,9 +1,27 @@
-import { User, Pencil, Trash2, Clock } from "lucide-react";
+import { User, Pencil, Trash2, Clock, Phone, MessageCircle } from "lucide-react";
 import { formatFechaCorta } from "../../utils/dates";
-import { estadoHermanoBadgeClass, estadoHermanoLabel } from "../../utils/hermanos";
-import { turnosDeHermano } from "../../utils/turnos";
+import { estadoHermanoBadgeClass, estadoHermanoLabel, whatsappLink } from "../../utils/hermanos";
+import { describeFrecuencia, turnosDeHermano } from "../../utils/turnos";
 import { useEdicion } from "../../context/edicion";
 import { useInfoPanel } from "../../context/infoPanel";
+
+export function ContactoHermano({ telefono }) {
+  if (!telefono) return null;
+  const wa = whatsappLink(telefono);
+  return (
+    <div className="exh-meta-row">
+      <span>Teléfono</span>
+      <strong className="exh-contacto">
+        <a href={`tel:${telefono.replace(/[^\d+]/g, "")}`} className="exh-contacto-link"><Phone size={12} /> {telefono}</a>
+        {wa && (
+          <a href={wa} target="_blank" rel="noopener noreferrer" className="exh-contacto-link" aria-label={`WhatsApp a ${telefono}`} title="Abrir WhatsApp">
+            <MessageCircle size={12} /> WhatsApp
+          </a>
+        )}
+      </strong>
+    </div>
+  );
+}
 
 export default function HermanoCard({ hermano, puntos, turnos, onEdit, onDelete }) {
   const modoEdicion = useEdicion();
@@ -23,11 +41,12 @@ export default function HermanoCard({ hermano, puntos, turnos, onEdit, onDelete 
         </div>
         {modoEdicion && (
           <div className="exh-card-actions">
-            <button type="button" className="exh-icon-btn" onClick={() => onEdit(hermano)}><Pencil size={14} /></button>
-            <button type="button" className="exh-icon-btn" onClick={() => onDelete(hermano.id)}><Trash2 size={14} /></button>
+            <button type="button" className="exh-icon-btn" aria-label={`Editar a ${hermano.nombre}`} title="Editar" onClick={() => onEdit(hermano)}><Pencil size={14} /></button>
+            <button type="button" className="exh-icon-btn" aria-label={`Borrar a ${hermano.nombre}`} title="Borrar" onClick={() => onDelete(hermano)}><Trash2 size={14} /></button>
           </div>
         )}
       </div>
+      <ContactoHermano telefono={hermano.telefono} />
       <div className="exh-meta-row"><span>Fecha aprobación</span><strong>{hermano.fechaAprobacion ? formatFechaCorta(hermano.fechaAprobacion) : "Sin registro"}</strong></div>
       <div className="exh-meta-row"><span>Disponibilidad</span><strong>{hermano.disponibilidad && hermano.disponibilidad.length ? hermano.disponibilidad.join(", ") : "Sin definir"}</strong></div>
 
@@ -66,7 +85,7 @@ export default function HermanoCard({ hermano, puntos, turnos, onEdit, onDelete 
                   ) : (
                     <span>Punto sin definir</span>
                   )}
-                  <span className="exh-badge exh-badge-amber">{t.frecuencia}</span>
+                  <span className="exh-badge exh-badge-amber">{describeFrecuencia(t)}</span>
                 </div>
               );
             })}

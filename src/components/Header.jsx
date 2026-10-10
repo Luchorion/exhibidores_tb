@@ -1,3 +1,5 @@
+import { LogIn, LogOut } from "lucide-react";
+
 export default function Header({
   operativos,
   totalCarritos,
@@ -8,23 +10,41 @@ export default function Header({
   turnosProgramados,
   carritosVencidos,
   totalTurnosConConflicto,
+  email,
+  puedeEditar,
   modoEdicion,
   onToggleEdicion,
+  onLogin,
+  onLogout,
 }) {
   return (
     <header className="exh-header">
       <div className="exh-header-top">
         <h1 className="exh-title">Talleres Boulogne</h1>
-        <button
-          type="button"
-          className={`exh-switch ${modoEdicion ? "on" : ""}`}
-          onClick={onToggleEdicion}
-          aria-pressed={modoEdicion}
-          title={modoEdicion ? "Modo edición activado: podés crear, editar y borrar" : "Modo solo lectura: activá la edición para hacer cambios"}
-        >
-          <span className="exh-switch-label">Edición</span>
-          <span className="exh-switch-track"><span className="exh-switch-thumb" /></span>
-        </button>
+        <div className="exh-header-actions">
+          {puedeEditar && (
+            <button
+              type="button"
+              className={`exh-switch ${modoEdicion ? "on" : ""}`}
+              onClick={onToggleEdicion}
+              role="switch"
+              aria-checked={modoEdicion}
+              title={modoEdicion ? "Modo edición activado: podés crear, editar y borrar" : "Modo solo lectura: activá la edición para hacer cambios"}
+            >
+              <span className="exh-switch-label">Edición</span>
+              <span className="exh-switch-track"><span className="exh-switch-thumb" /></span>
+            </button>
+          )}
+          {email ? (
+            <button type="button" className="exh-header-link" onClick={onLogout} title={`Conectado como ${email}`}>
+              <LogOut size={13} /> Salir
+            </button>
+          ) : (
+            <button type="button" className="exh-header-link" onClick={onLogin} title="Ingresar como responsable para editar">
+              <LogIn size={13} /> Ingresar
+            </button>
+          )}
+        </div>
       </div>
       <div className="exh-board">
         <div className="exh-board-cell">
@@ -47,7 +67,7 @@ export default function Header({
           <p className="exh-board-label">Mantenimiento vencido</p>
           <p className={`exh-board-value ${carritosVencidos > 0 ? "warn" : ""}`}>{carritosVencidos}</p>
         </div>
-        <div className="exh-board-cell">
+        <div className="exh-board-cell" title="Turnos superpuestos que comparten un hermano o un carrito">
           <p className="exh-board-label">Conflictos</p>
           <p className={`exh-board-value ${totalTurnosConConflicto > 0 ? "danger" : ""}`}>{totalTurnosConConflicto}</p>
         </div>
