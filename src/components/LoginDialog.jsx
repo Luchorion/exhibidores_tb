@@ -2,12 +2,26 @@ import { useId, useState } from "react";
 import { Mail } from "lucide-react";
 import Modal from "./Modal";
 
+// Traduce los errores más comunes de Supabase Auth a algo accionable.
+function motivoError(err) {
+  const code = err?.code || "";
+  const msg = err?.message || "";
+  if (err?.status === 429 || code.includes("rate_limit") || /rate limit|security purposes/i.test(msg)) {
+    return "Se pidieron demasiados links seguidos. Esperá un rato (puede ser hasta una hora) y probá de nuevo. Mientras, revisá si te llegó alguno de los anteriores.";
+  }
+  if (code === "otp_disabled" || code === "signup_disabled" || code === "user_not_found" || /signups not allowed/i.test(msg)) {
+    return "Ese email no está habilitado. Pedile a un administrador que te invite.";
+  }
+  return `No se pudo enviar el link${msg ? `: ${msg}` : ""}.`;
+}
+
 // Ingreso sin contraseña: se manda un link al mail. Solo funciona para
 // cuentas que un administrador invitó desde el panel de Supabase.
 export default function LoginDialog({ onEnviar, onClose }) {
   const emailId = useId();
   const [email, setEmail] = useState("");
   const [estado, setEstado] = useState("idle"); // idle | enviando | enviado | error
+  const [error, setError] = useState("");
 
   async function enviar(e) {
     e.preventDefault();
@@ -16,7 +30,8 @@ export default function LoginDialog({ onEnviar, onClose }) {
     try {
       await onEnviar(email.trim());
       setEstado("enviado");
-    } catch {
+    } catch (err) {
+      setError(motivoError(err));
       setEstado("error");
     }
   }
@@ -51,7 +66,7 @@ export default function LoginDialog({ onEnviar, onClose }) {
           </p>
           {estado === "error" && (
             <div className="exh-warn-box" role="alert">
-              No se pudo enviar el link. Revisá el email o pedile a un administrador que te habilite.
+              {error}
             </div>
           )}
           <div className="exh-form-actions">
